@@ -2,6 +2,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.models.database import Base, engine
+from app.api.coworking_router import *
+
+
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
@@ -14,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(coworking_router)
 
 
 @app.get("/")
