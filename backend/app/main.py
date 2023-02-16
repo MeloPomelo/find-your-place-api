@@ -1,12 +1,30 @@
 import uvicorn 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_async_sqlalchemy import SQLAlchemyMiddleware
 
+
+from api.api import api_router
 from fastapi_async_sqlalchemy import db
 from sqlmodel import text
 
+# from core.config import settings
+
 
 app = FastAPI()
+app.include_router(api_router)
+
+app.add_middleware(
+    SQLAlchemyMiddleware,
+    # db_url=settings.DATABASE_URL,
+    db_url="",
+    engine_args={
+        "echo": False,
+        "pool_pre_ping": True,
+        "pool_size": 83,
+        "max_overflow": 64,
+    },
+)
 
 origins = ["*"]
 

@@ -3,11 +3,15 @@ from sqlmodel import BigInteger, Field, SQLModel, Relationship, Column, DateTime
 
 from typing import List, Optional
 from pydantic import EmailStr
-from app.models.base_model import BaseUUIDModel
+from models.base_model import BaseUUIDModel
 
 
-class Workspace(BaseUUIDModel, table=True):
+class WorkspaceBase(SQLModel):
     title: Optional[str] = Field(nullable=False)
     description: Optional[str] = Field(nullable=False)
+
+class Workspace(BaseUUIDModel, WorkspaceBase,table=True):
+    __tablename__ = "workspaces"
+    pass
 
 
