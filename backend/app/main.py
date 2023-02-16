@@ -2,11 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models.database import Base, engine
-from app.api.coworking_router import *
-
-
-# Base.metadata.create_all(bind=engine)
+from fastapi_async_sqlalchemy import db
+from sqlmodel import text
 
 
 app = FastAPI()
@@ -21,12 +18,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(coworking_router)
-
-
 @app.get("/")
 async def root():
     return {"message": "Hello there!"}
+
+
+async def add_postgresql_extension() -> None:
+    async with db():
+        query = text("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+        return await db.session.execute(query)
+
+
+@app.on_event("startup")
+async def on_startup():
+    await add_postgresql_extension()
+    print("startup fastapi")
 
 
 if __name__ == "__main__":

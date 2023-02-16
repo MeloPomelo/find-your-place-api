@@ -5,8 +5,9 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_SERVER: str
-    FIREBASE_URL: str
     DATABASE_URL: str
+    
+    FIREBASE_URL: str
 
 
 settings = Settings(

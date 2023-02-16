@@ -1,3 +1,2 @@
-from .database import Base
-
-from .coworking_model import Coworking
+from .base_model import SQLModel, BaseUUIDModel
+from .workspace_model import Workspace
