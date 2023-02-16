@@ -6,7 +6,7 @@ from app.models.database import Base, engine
 from app.api.coworking_router import *
 
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
