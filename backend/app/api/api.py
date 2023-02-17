@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api.endpoints import (
+from app.api.endpoints import (
     workspace,
 )
 

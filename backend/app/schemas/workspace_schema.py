@@ -1,4 +1,4 @@
-from models.workspace_model import WorkspaceBase
+from app.models.workspace_model import WorkspaceBase
 
 
 class WorkspaceCreate(WorkspaceBase):
@@ -11,4 +11,5 @@ class WorkspaceUpdate(WorkspaceBase):
 
 class WorkspaceRead(WorkspaceBase):
     id: int
+    
 

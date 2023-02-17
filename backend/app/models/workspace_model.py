@@ -3,7 +3,7 @@ from sqlmodel import BigInteger, Field, SQLModel, Relationship, Column, DateTime
 
 from typing import List, Optional
 from pydantic import EmailStr
-from models.base_model import BaseUUIDModel
+from app.models.base_model import BaseUUIDModel
 
 
 class WorkspaceBase(SQLModel):

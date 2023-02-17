@@ -3,11 +3,11 @@ from uuid import UUID
 # from app.utils.exceptions import IdNotFoundException
 from fastapi import APIRouter, Depends, Query
 # from fastapi_pagination import Params
-from crud import workspace_crud as crud 
+from app.crud import workspace_crud as crud 
 # from app.api import deps
-from models.workspace_model import Workspace
+from app.models.workspace_model import Workspace
 
-from schemas.workspace_schema import (
+from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
     WorkspaceUpdate,
