@@ -11,7 +11,7 @@ POOL_SIZE = max(DB_POOL_SIZE // WEB_CONCURRENCY, 5)
 connect_args = {"check_same_thread": False}
 
 engine = create_async_engine(
-    settings.ASYNC_DATABASE_URI,
+    settings.DATABASE_URL,
     echo=True,
     future=True,
     pool_size=POOL_SIZE,

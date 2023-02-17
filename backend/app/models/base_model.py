@@ -13,12 +13,7 @@ class SQLModel(_SQLModel):
 
 
 class BaseUUIDModel(SQLModel):
-    id: int = Field(
-        # default_factory=uuid.uuid4,
-        primary_key=True,
-        index=True,
-        nullable=False,
-    )
+    id: Optional[int] = Field(default=None, primary_key=True)
     updated_at: Optional[datetime] = Field(
         default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow}
     )
