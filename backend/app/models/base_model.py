@@ -1,6 +1,5 @@
-import uuid
+from uuid import UUID, uuid4
 from typing import Optional
-# from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import SQLModel as _SQLModel, Field
 from sqlalchemy.orm import declared_attr
 from datetime import datetime
@@ -13,7 +12,7 @@ class SQLModel(_SQLModel):
 
 
 class BaseUUIDModel(SQLModel):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    uuid: UUID = Field(default_factory=uuid4, primary_key=True)
     updated_at: Optional[datetime] = Field(
         default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow}
     )

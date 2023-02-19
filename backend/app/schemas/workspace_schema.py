@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from app.models.workspace_model import WorkspaceBase
 
 
@@ -10,6 +12,6 @@ class WorkspaceUpdate(WorkspaceBase):
 
 
 class WorkspaceRead(WorkspaceBase):
-    id: int
+    uuid: UUID
     
 

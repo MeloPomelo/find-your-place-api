@@ -31,7 +31,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     async def get(
-        self, *, id: Union[UUID, str], db_session: Optional[AsyncSession] = None
+        self, 
+        *, 
+        id: Union[UUID, str], 
+        db_session: Optional[AsyncSession] = None
     ) -> Optional[ModelType]:
         db_session = db_session or db.session
         query = select(self.model).where(self.model.id == id)
@@ -47,7 +50,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> ModelType:
         db_session = db_session or db.session
         db_obj = self.model.from_orm(obj_in)  # type: ignore
-
         # if created_by_id:
         #     db_obj.created_by_id = created_by_id
 
@@ -89,7 +91,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return obj_current
 
     async def remove(
-        self, *, id: Union[UUID, str], db_session: Optional[AsyncSession] = None
+        self, 
+        *, 
+        id: Union[UUID, str], 
+        db_session: Optional[AsyncSession] = None
     ) -> ModelType:
         db_session = db_session or db.session
         response = await db_session.execute(

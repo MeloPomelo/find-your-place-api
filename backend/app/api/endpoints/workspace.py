@@ -1,10 +1,7 @@
 from typing import Optional
 from uuid import UUID
-# from app.utils.exceptions import IdNotFoundException
-from fastapi import APIRouter, Depends, Query
-# from fastapi_pagination import Params
+from fastapi import APIRouter, Depends, Query, HTTPException
 from app.crud import workspace_crud as crud 
-# from app.api import deps
 from app.models.workspace_model import Workspace
 
 from app.schemas.workspace_schema import (
@@ -12,26 +9,66 @@ from app.schemas.workspace_schema import (
     WorkspaceRead,
     WorkspaceUpdate,
 )
-# from app.schemas.response_schema import (
-#     IDeleteResponseBase,
-#     IGetResponseBase,
-#     IGetResponsePaginated,
-#     IPostResponseBase,
-#     IPutResponseBase,
-#     create_response,
-# )
-# from app.schemas.role_schema import IRoleEnum
+from app.schemas.response_schemas import (
+    GetResponseBase, 
+    PostResponseBase, 
+    PutResponseBase, 
+    DeleteResponseBase,
+    create_response,
+)
+
 
 router = APIRouter()
 
 
-@router.post("")
-async def create_hero(
+@router.get("/{workspace_id}")
+async def get_workspace_by_id(
+    workspace_id: UUID,
+) -> GetResponseBase[WorkspaceRead]:
+    """
+    Gets a workspace by its id
+    """
+    workspace = await crud.workspace.get(id=workspace_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    return create_response(data=workspace)
+
+
+@router.post("/create_workspace")
+async def create_workspace(
     workspace: WorkspaceCreate,
-#     current_user: User = Depends(
-#         deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-#     ),
-# ) -> IPostResponseBase[IHeroRead]:
-    ):
-    heroe = await crud.workspace.create(obj_in=workspace)
-    return "заебись создал"
+) -> PostResponseBase[WorkspaceRead]:
+    """
+    Create a new workspace
+    """
+    workspace = await crud.workspace.create(obj_in=workspace)
+    return create_response(data=workspace)
+
+
+@router.put("/update_workspace")
+async def update_workspace(
+    workspace_id: UUID,
+    workspace: WorkspaceUpdate,
+) -> PutResponseBase[WorkspaceUpdate]:
+    """
+    Upadate a workspace
+    """
+    current_workspace = await crud.workspace.get(id=workspace_id)
+    if not current_workspace:
+        raise HTTPException(status_code=404, detail="Worksapce not found")
+    workspace_updated = await crud.workspace.update(obj_new=workspace, obj_current=current_workspace)
+    return create_response(data=workspace_updated)
+
+
+@router.delete("/delete_workspace")
+async def delete_workspace(
+    workspace_id: UUID,
+) -> DeleteResponseBase[WorkspaceRead]:
+    """
+    Delete a workspace
+    """
+    current_workspace = await crud.workspace.get(id=workspace_id)
+    if not current_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    workspace = await crud.workspace.remove(id=workspace_id)
+    return create_response(workspace)
