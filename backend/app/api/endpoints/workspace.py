@@ -1,0 +1,74 @@
+from typing import Optional
+from uuid import UUID
+from fastapi import APIRouter, Depends, Query, HTTPException
+from app.crud import workspace_crud as crud 
+from app.models.workspace_model import Workspace
+
+from app.schemas.workspace_schema import (
+    WorkspaceCreate,
+    WorkspaceRead,
+    WorkspaceUpdate,
+)
+from app.schemas.response_schemas import (
+    GetResponseBase, 
+    PostResponseBase, 
+    PutResponseBase, 
+    DeleteResponseBase,
+    create_response,
+)
+
+
+router = APIRouter()
+
+
+@router.get("/{workspace_id}")
+async def get_workspace_by_id(
+    workspace_id: UUID,
+) -> GetResponseBase[WorkspaceRead]:
+    """
+    Gets a workspace by its id
+    """
+    workspace = await crud.workspace.get(id=workspace_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    return create_response(data=workspace)
+
+
+@router.post("/create_workspace")
+async def create_workspace(
+    workspace: WorkspaceCreate,
+) -> PostResponseBase[WorkspaceRead]:
+    """
+    Create a new workspace
+    """
+    workspace = await crud.workspace.create(obj_in=workspace)
+    return create_response(data=workspace)
+
+
+@router.put("/update_workspace")
+async def update_workspace(
+    workspace_id: UUID,
+    workspace: WorkspaceUpdate,
+) -> PutResponseBase[WorkspaceUpdate]:
+    """
+    Upadate a workspace
+    """
+    current_workspace = await crud.workspace.get(id=workspace_id)
+    if not current_workspace:
+        raise HTTPException(status_code=404, detail="Worksapce not found")
+    workspace_updated = await crud.workspace.update(obj_new=workspace, obj_current=current_workspace)
+    return create_response(data=workspace_updated)
+
+
+@router.delete("/delete_workspace")
+async def delete_workspace(
+    workspace_id: UUID,
+) -> DeleteResponseBase[WorkspaceRead]:
+    """
+    Delete a workspace
+    """
+    current_workspace = await crud.workspace.get(id=workspace_id)
+    if not current_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    workspace = await crud.workspace.remove(id=workspace_id)
+    return create_response(workspace)

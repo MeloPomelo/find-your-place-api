@@ -1,3 +1,4 @@
+import os
 from pydantic import BaseSettings
 
 
@@ -5,8 +6,13 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_SERVER: str
-    FIREBASE_URL: str
     DATABASE_URL: str
+    
+    FIREBASE_URL: str
+
+    # class Config:
+    #     case_sensitive = True
+    #     env_file = os.path.expanduser("~/.env")
 
 
 settings = Settings(
