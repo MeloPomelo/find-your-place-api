@@ -12,6 +12,6 @@ class WorkspaceUpdate(WorkspaceBase):
 
 
 class WorkspaceRead(WorkspaceBase):
-    uuid: UUID
+    id: UUID
     
 
