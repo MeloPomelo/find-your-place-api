@@ -127,4 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-backend/find-your-place-d7479-firebase-adminsdk-mgwkv-e0b4924f1d.json
+backend/app/core/find-your-place-firebase-adminsdk.json
+backend/app/core/firebase_config.json
