@@ -1,16 +1,18 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi_pagination import Params
+
 from app.crud import workspace_crud as crud 
 from app.models.workspace_model import Workspace
-
 from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
     WorkspaceUpdate,
 )
 from app.schemas.response_schemas import (
-    GetResponseBase, 
+    GetResponseBase,
+    GetResponsePaginated,
     PostResponseBase, 
     PutResponseBase, 
     DeleteResponseBase,
@@ -19,6 +21,18 @@ from app.schemas.response_schemas import (
 
 
 router = APIRouter()
+
+
+@router.get("")
+async def get_workspace_list(
+    params: Params = Depends(),
+) -> GetResponsePaginated[WorkspaceRead]:
+    """
+    Gets a paginated list of workspaces
+    """
+    workspaces = await crud.workspace.get_multi_paginated(params=params)
+    return create_response(data=workspaces)
+
 
 
 @router.get("/{workspace_id}")

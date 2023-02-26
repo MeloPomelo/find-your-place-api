@@ -2,9 +2,9 @@ from fastapi import HTTPException
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from uuid import UUID
 # from app.schemas.common_schema import IOrderEnum
-# from fastapi_pagination.ext.async_sqlalchemy import paginate
+from fastapi_pagination.ext.async_sqlalchemy import paginate
 from fastapi_async_sqlalchemy import db
-# from fastapi_pagination import Params, Page
+from fastapi_pagination import Params, Page
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlmodel import SQLModel, select, func
@@ -40,7 +40,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = select(self.model).where(self.model.id == id)
         response = await db_session.execute(query)
         return response.scalar_one_or_none()
-
+    
+    async def get_multi_paginated(
+        self,
+        *,
+        params: Optional[Params] = Params(),
+        query: Optional[Union[T, Select[T]]] = None,
+        db_session: Optional[AsyncSession] = None,
+    ) -> Page[ModelType]:
+        db_session = db_session or db.session
+        if query is None:
+            query = select(self.model)
+        return await paginate(db_session, query, params)
+    
     async def create(
         self,
         *,
