@@ -3,8 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi_pagination import Params
 
+from app.api.endpoints import deps
+from app.models.users_model import User
 from app.crud import workspace_crud as crud 
 from app.models.workspace_model import Workspace
+from app.schemas.role_schema import RoleEnum
 from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
@@ -51,6 +54,7 @@ async def get_workspace_by_id(
 @router.post("/create_workspace")
 async def create_workspace(
     workspace: WorkspaceCreate,
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin, RoleEnum.user])),
 ) -> PostResponseBase[WorkspaceRead]:
     """
     Create a new workspace
@@ -63,6 +67,7 @@ async def create_workspace(
 async def update_workspace(
     workspace_id: UUID,
     workspace: WorkspaceUpdate,
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> PutResponseBase[WorkspaceUpdate]:
     """
     Upadate a workspace
@@ -77,6 +82,7 @@ async def update_workspace(
 @router.delete("/delete_workspace")
 async def delete_workspace(
     workspace_id: UUID,
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> DeleteResponseBase[WorkspaceRead]:
     """
     Delete a workspace

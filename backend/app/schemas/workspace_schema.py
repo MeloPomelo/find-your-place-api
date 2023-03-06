@@ -13,5 +13,8 @@ class WorkspaceUpdate(WorkspaceBase):
 
 class WorkspaceRead(WorkspaceBase):
     id: UUID
+
+    class Config:
+        orm_mode = True
     
 

@@ -1,0 +1,30 @@
+from datetime import datetime
+from sqlmodel import Field, SQLModel, DateTime, Column, Relationship
+from typing import Optional
+from pydantic import EmailStr
+from uuid import UUID
+
+from app.models.base_model import BaseUUIDModel
+
+
+class UserBase(SQLModel):
+    first_name: str
+    last_name: str
+    username: str = Field(
+        nullable=True, index=True, sa_column_kwargs={"unique": True}
+    )
+    birthdate: Optional[datetime] = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=True)
+    )
+    # role_id: Optional[UUID] = Field(default=None, foreign_key="roles.id")
+
+
+
+class User(BaseUUIDModel, UserBase, table=True):
+    __tablename__ = 'users'
+    hashed_password: Optional[str] = Field(nullable=False, index=True)
+    role: Optional["Role"] = Relationship(  # noqa: F821
+        back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
+    )
+    role_id: Optional[UUID] = Field(default=None, foreign_key="roles.id")
+    is_active: bool = Field(default=True)

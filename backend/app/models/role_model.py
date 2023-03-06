@@ -1,0 +1,16 @@
+from sqlmodel import SQLModel, Relationship
+from typing import List
+
+from app.models.base_model import BaseUUIDModel
+
+
+class RoleBase(SQLModel):
+    name: str
+    description: str
+
+
+class Role(BaseUUIDModel, RoleBase, table=True):
+    __tablename__ = 'roles'
+    users: List["User"] = Relationship(  # noqa: F821
+        back_populates="role", sa_relationship_kwargs={"lazy": "selectin"}
+    )
