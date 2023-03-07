@@ -127,5 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-backend/app/core/find-your-place-firebase-adminsdk.json
-backend/app/core/firebase_config.json
+
+firebase/
+
+db_docker

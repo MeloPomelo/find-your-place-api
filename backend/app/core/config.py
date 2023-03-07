@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     FIREBASE_URL: str
 
 
-settings = Settings(
-    _env_file='.env',
-    _env_file_encoding='utf-8',
-)
+    class Config:
+        case_sensitive = True
+        env_file = os.path.expanduser("~/.env")
+
+
+settings = Settings() 
