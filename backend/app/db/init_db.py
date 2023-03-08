@@ -3,7 +3,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.crud import role_crud, user_crud
 from app.schemas.role_schema import RoleCreate
 from app.core.config import settings
-from app.schemas.user_schema import UserCreate
+from app.schemas.user_schema import UserCreateWithRole
 
 
 roles: List[RoleCreate] = [
@@ -13,9 +13,9 @@ roles: List[RoleCreate] = [
 ]
 
 
-users: List[Dict[str, Union[str, UserCreate]]] = [
+users: List[Dict[str, Union[str, UserCreateWithRole]]] = [
     {
-        "data": UserCreate(
+        "data": UserCreateWithRole(
             first_name="Admin",
             last_name="FastAPI",
             password=settings.FIRST_SUPERUSER_PASSWORD,
@@ -24,7 +24,7 @@ users: List[Dict[str, Union[str, UserCreate]]] = [
         "role": "admin",
     },
     {
-        "data": UserCreate(
+        "data": UserCreateWithRole(
             first_name="User",
             last_name="FastAPI",
             password=settings.FIRST_USER_PASSWORD,
@@ -53,7 +53,7 @@ async def init_db(db_session: AsyncSession) -> None:
         )
         if not current_user:
             user["data"].role_id = role.id
-            await user_crud.user.create_user(obj_in=user["data"], db_session=db_session)
+            await user_crud.user.create_with_role(obj_in=user["data"], db_session=db_session)
 
    
 
