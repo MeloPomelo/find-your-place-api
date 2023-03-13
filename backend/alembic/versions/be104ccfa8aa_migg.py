@@ -1,8 +1,8 @@
-"""mig
+"""migg
 
-Revision ID: cf087a5d7c87
-Revises: 96cb87c2070a
-Create Date: 2023-03-06 14:44:26.204790
+Revision ID: be104ccfa8aa
+Revises: 
+Create Date: 2023-03-08 15:38:36.186302
 
 """
 from alembic import op
@@ -11,8 +11,8 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = 'cf087a5d7c87'
-down_revision = '96cb87c2070a'
+revision = 'be104ccfa8aa'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -27,17 +27,25 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('workspaces',
+    sa.Column('title', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('id', sqlmodel.sql.sqltypes.GUID(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('users',
     sa.Column('birthdate', sa.DateTime(timezone=True), nullable=True),
     sa.Column('first_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('last_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('username', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('role_id', sqlmodel.sql.sqltypes.GUID(), nullable=True),
-    sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('id', sqlmodel.sql.sqltypes.GUID(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('role_id', sqlmodel.sql.sqltypes.GUID(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -51,5 +59,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_hashed_password'), table_name='users')
     op.drop_table('users')
+    op.drop_table('workspaces')
     op.drop_table('roles')
     # ### end Alembic commands ###

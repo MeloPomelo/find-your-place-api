@@ -15,29 +15,36 @@ services:
     env_file: ".env"
     depends_on:
       - database
-
-  traefik:
-    image: traefik:v2.2
-    container_name: traefik
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yaml:/traefik.yaml:ro
-      - ./traefik/acme.json:/acme.json
+    links:
+      - traefik-proxy:storage.localhost
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=https"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.example.com`)"
-      - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
+      - "traefik.http.routers.fastapi_local.entrypoints=web"
+      - "traefik.http.routers.fastapi_local.rule=Host(`fastapi.${LOCAL_1}`, `fastapi.${LOCAL_2}`)"
+      - "traefik.http.routers.fastapi_local_base.entrypoints=web"
+      - "traefik.http.routers.fastapi_local_base.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`)"
+      - "traefik.http.services.fastapi_localservice.loadbalancer.server.port=8000"
+
+  traefik-proxy:
+    container_name: traefik-proxy
+    restart: always
+    image: "traefik:latest"
+    command:
+      - "--providers.docker=true"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./traefik/traefik.yaml:/traefik.yaml:ro
+      - ./traefik/.htpasswd:/.htpasswd
+      - "${EB_LOG_BASE_DIR:-./traefik}/logs:/logs"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
+    env_file: ".env"
   
   database:
     image: postgres:latest
