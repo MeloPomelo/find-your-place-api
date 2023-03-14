@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.schemas.token_schema import TokenType
+from app.utils.minio_client import MinioClient
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -20,7 +21,6 @@ reusable_oauth2 = OAuth2PasswordBearer(
 def get_current_user(required_roles: List[str] = None) -> User:
     async def current_user(
         token: str = Depends(reusable_oauth2),
-        # redis_client: Redis = Depends(get_redis_client),
     ) -> User:
         try:
             payload = jwt.decode(
@@ -32,16 +32,6 @@ def get_current_user(required_roles: List[str] = None) -> User:
                 detail="Could not validate credentials",
             )
         user_id = payload["sub"]
-
-        # valid_access_tokens = await get_valid_tokens(
-        #     redis_client, user_id, TokenType.ACCESS
-        # )
-        # if valid_access_tokens and token not in valid_access_tokens:
-        #     raise HTTPException(
-        #         status_code=status.HTTP_403_FORBIDDEN,
-        #         detail="Could not validate credentials",
-        #     )
-
         user: User = await crud.user.get(id=user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -66,3 +56,11 @@ def get_current_user(required_roles: List[str] = None) -> User:
     return current_user
 
 
+def minio_auth() -> MinioClient:
+    minio_client = MinioClient(
+        access_key=settings.MINIO_ROOT_USER,
+        secret_key=settings.MINIO_ROOT_PASSWORD,
+        bucket_name=settings.MINIO_BUCKET,
+        minio_url=settings.MINIO_URL,
+    )
+    return minio_client

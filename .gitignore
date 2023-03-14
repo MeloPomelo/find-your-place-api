@@ -133,3 +133,5 @@ db_docker
 
 /traefik/.htpasswd
 /traefik/logs
+
+minio

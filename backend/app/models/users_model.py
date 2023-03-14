@@ -21,10 +21,9 @@ class UserBase(SQLModel):
 
 
 class User(BaseUUIDModel, UserBase, table=True):
-    __tablename__ = 'users'
     hashed_password: Optional[str] = Field(nullable=False, index=True)
     role: Optional["Role"] = Relationship(  # noqa: F821
         back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
     )
-    role_id: Optional[UUID] = Field(default=None, foreign_key="roles.id")
+    role_id: Optional[UUID] = Field(default=None, foreign_key="Role.id")
     is_active: bool = Field(default=True)

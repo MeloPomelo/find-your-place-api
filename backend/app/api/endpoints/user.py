@@ -1,8 +1,3 @@
-import firebase_admin
-import pyrebase
-import json
- 
-from firebase_admin import credentials, auth
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
