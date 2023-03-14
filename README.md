@@ -32,7 +32,7 @@ docker system prune -a
 ```
 
 ## URLS
-- *FAST_API SWAGGER* [http://fastapi.localhost/docs](http://fastapi.localhost/docs)
+- *fastapi swagger* [http://fastapi.localhost/docs](http://fastapi.localhost/docs)
 - *pgadmin* [http://localhost:5050](http://localhost:5050)
 - *minio* [http://storage.localhost](http://storage.localhost)
 - *traefik* [http://traefik.localhost](http://traefik.localhost)
