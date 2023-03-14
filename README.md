@@ -26,7 +26,7 @@ docker-compose run fastapi_server python app/init_data.py
 docker-compose up
 ```
 ### Docker commands
-*Очистка контейнеров*
+*очистка контейнеров*
 ```sh
 docker system prune -a
 ```
