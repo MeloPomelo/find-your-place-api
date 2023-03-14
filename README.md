@@ -11,18 +11,28 @@ This is a project template which uses [FastAPI](https://fastapi.tiangolo.com/), 
 docker-compose build
 ```
 *миграция базы данных*
-```docker-compose run fastapi_server alembic revision --autogenerate -m "mig"```
-```docker-compose run fastapi_server alembic upgrade head```
+```sh
+docker-compose run fastapi_server alembic revision --autogenerate -m "mig"
+```
+```sh
+docker-compose run fastapi_server alembic upgrade head
+```
 *создание супер юзера*
-```docker-compose run fastapi_server python app/init_data.py```
+```sh
+docker-compose run fastapi_server python app/init_data.py
+```
 *запуск контейнеров*
-```docker-compose up```
+```sh
+docker-compose up
+```
 ## Команды для docker
 *Очистка контейнеров*
-```docker system prune -a```
+```sh
+docker system prune -a
+```
 
 ## URLS
-*FAST_API SWAGGER* [http://fastapi.localhost/docs](http://fastapi.localhost/docs)
-*pgadmin* [http://localhost:5050](http://localhost:5050)
-*minio* [http://storage.localhost](http://storage.localhost)
-*traefik* [http://traefik.localhost](http://traefik.localhost)
+- *FAST_API SWAGGER* [http://fastapi.localhost/docs](http://fastapi.localhost/docs)
+- *pgadmin* [http://localhost:5050](http://localhost:5050)
+- *minio* [http://storage.localhost](http://storage.localhost)
+- *traefik* [http://traefik.localhost](http://traefik.localhost)
