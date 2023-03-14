@@ -2,10 +2,10 @@
 This is a project template which uses [FastAPI](https://fastapi.tiangolo.com/), [Alembic](https://alembic.sqlalchemy.org/en/latest/) and async [SQLModel](https://sqlmodel.tiangolo.com/) as ORM. It shows a complete async CRUD template using authentication.
 
 ## Настройка среды
-Создать **.env** файл в корневой папке проекта. Содержимое скопируйте из **.env.example**. Изменить в соответствии с вашей конфигурации.
+Создать **.env** файл в корневой папке проекта. Содержимое скопируйте из **.env.example**. Изменить в соответствии с вашей конфигурацией.
 
 ## Запускаем проект с использованием Docker и настройкой контейнеров
-#Docker compose commands
+### Docker compose commands
 *создание контейнеров и подключение всех библиотек*
 ```sh
 docker-compose build
@@ -25,7 +25,7 @@ docker-compose run fastapi_server python app/init_data.py
 ```sh
 docker-compose up
 ```
-## Команды для docker
+### Команды для docker
 *Очистка контейнеров*
 ```sh
 docker system prune -a
