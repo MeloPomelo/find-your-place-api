@@ -18,6 +18,7 @@ from app.utils.minio_client import MinioClient
 from app.models.users_model import User
 from app.models.workspace_model import Workspace
 from app.models.image_media_model import ImageMedia
+from app.models.comment_model import Comment
 from app.schemas.role_schema import RoleEnum
 from app.crud import workspace_crud as crud 
 from app.schemas.workspace_schema import (
@@ -34,7 +35,11 @@ from app.schemas.response_schemas import (
     create_response,
 )
 from app.schemas.media_schema import MediaCreate
-
+from app.schemas.comment_schema import (
+    CommentCreate,
+    CommentUpdate,
+    CommentRead
+)
 
 router = APIRouter()
 
@@ -73,6 +78,8 @@ async def create_workspace(
     Create a new workspace
     """
     workspace = await crud.workspace.create(obj_in=workspace)
+    
+
     return create_response(data=workspace)
 
 
@@ -107,8 +114,8 @@ async def delete_workspace(
     return create_response(workspace)
 
 
-@router.post("/image")
-async def upload_my_image(
+@router.post("/add_workspace_image")
+async def add_workspace_image(
     workspace_id: UUID,
     title: Optional[str] = Body(None),
     description: Optional[str] = Body(None),
@@ -126,11 +133,12 @@ async def upload_my_image(
             file_data=BytesIO(image_modified.file_data),
             content_type=image_file.content_type,
         )
+        
         media = MediaCreate(
             title=title, description=description, path=data_file.file_name
         )
 
-        image_media = await crud.workspace.update_photo(
+        image_media = await crud.workspace.add_photo(
             workspace_id=workspace_id,
             image=media,
             heigth=image_modified.height,
@@ -142,3 +150,16 @@ async def upload_my_image(
     except Exception as e:
         print(e)
         return Response("Internal server error", status_code=500)
+    
+
+@router.post("/add_comment")
+async def add_comment(
+    workspace_id: UUID,
+    comment: CommentCreate,
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.user, RoleEnum.admin])),
+) -> PostResponseBase[CommentRead]:
+    """
+    Create a comment to workspace
+    """
+    new_comment = await crud.workspace.add_comment(workspace_id=workspace_id, user_id=current_user.id, comment=comment)
+    return create_response(data=new_comment)

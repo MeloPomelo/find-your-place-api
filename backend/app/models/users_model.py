@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlmodel import Field, SQLModel, DateTime, Column, Relationship
-from typing import Optional
+from typing import Optional, List
 from pydantic import EmailStr
 from uuid import UUID
 
@@ -16,14 +16,18 @@ class UserBase(SQLModel):
     birthdate: Optional[datetime] = Field(
         sa_column=Column(DateTime(timezone=True), nullable=True)
     )
-    # role_id: Optional[UUID] = Field(default=None, foreign_key="roles.id")
-
 
 
 class User(BaseUUIDModel, UserBase, table=True):
     hashed_password: Optional[str] = Field(nullable=False, index=True)
+
     role: Optional["Role"] = Relationship(  # noqa: F821
         back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
     )
     role_id: Optional[UUID] = Field(default=None, foreign_key="Role.id")
+
+    comments: List["Comment"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
     is_active: bool = Field(default=True)
