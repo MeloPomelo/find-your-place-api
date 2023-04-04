@@ -4,6 +4,7 @@ from typing import List, Optional
 from app.models.workspace_model import WorkspaceBase
 from app.schemas.image_media_schema import ImageMediaRead
 from app.schemas.comment_schema import CommentRead
+from app.schemas.dictionary_schema import DictionaryRead
 
 
 class WorkspaceCreate(WorkspaceBase):
@@ -18,6 +19,4 @@ class WorkspaceRead(WorkspaceBase):
     id: UUID
     images:  Optional[List[ImageMediaRead]] = []
     comments: Optional[List[CommentRead]] = []
-
-
-
+    parameters: Optional[List[DictionaryRead]] = []

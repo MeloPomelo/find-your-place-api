@@ -5,7 +5,7 @@ from pydantic import EmailStr
 from uuid import UUID
 
 from app.models.base_model import BaseUUIDModel
-
+from .dictionary_model import Dictionary
 
 class WorkspaceBase(SQLModel):
     title: Optional[str] = Field(nullable=False)
@@ -19,4 +19,27 @@ class Workspace(BaseUUIDModel, WorkspaceBase, table=True):
 
     comments: List["Comment"] = Relationship(
         back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+    parameters: List["WorkspaceParameters"] = Relationship(
+        back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
+    ) 
+
+
+class WorkspaceParameters(SQLModel, table=True):
+    workspace_id: Optional[UUID] = Field(
+        default=None, foreign_key="Workspace.id", primary_key=True
+        ) 
+    workspace: Optional["Workspace"] = Relationship(
+        back_populates="parameters", sa_relationship_kwargs={"lazy": "joined"}
+    )
+
+    parameter_id: Optional[UUID] = Field(
+        default=None, foreign_key="Dictionary.id"
+    )
+    dictionary: Dictionary = Relationship(
+        sa_relationship_kwargs={
+            "lazy": "joined",
+            "primaryjoin": "WorkspaceParameters.parameter_id==Dictionary.id",
+        }
     )
