@@ -36,11 +36,7 @@ from app.schemas.response_schemas import (
     DeleteResponseBase,
     create_response,
 )
-from app.schemas.comment_schema import (
-    CommentCreate,
-    CommentUpdate,
-    CommentRead
-)
+
 
 router = APIRouter()
 
@@ -150,15 +146,3 @@ async def upload_image(
         print(e)
         return Response("Internal server error", status_code=500)
     
-
-@router.post("/add_comment")
-async def add_comment(
-    workspace_id: UUID,
-    comment: CommentCreate,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.user, RoleEnum.admin])),
-) -> PostResponseBase[CommentRead]:
-    """
-    Create a comment to workspace
-    """
-    new_comment = await crud.workspace.add_comment(workspace_id=workspace_id, user_id=current_user.id, comment=comment)
-    return create_response(data=new_comment)
