@@ -70,7 +70,7 @@ async def get_workspace_by_id(
     return create_response(data=workspace)
 
 
-@router.post("/create_workspace")
+@router.post("")
 async def create_workspace(
     workspace: WorkspaceCreate,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin, RoleEnum.user])),
@@ -89,7 +89,7 @@ async def create_workspace(
     return create_response(data=new_workspace) 
 
 
-@router.put("/update_workspace")
+@router.put("/{workspace_id}")
 async def update_workspace(
     workspace_id: UUID,
     workspace: WorkspaceUpdate,
@@ -105,7 +105,7 @@ async def update_workspace(
     return create_response(data=workspace_updated)
 
 
-@router.delete("/delete_workspace")
+@router.delete("/{workspace_id}")
 async def delete_workspace(
     workspace_id: UUID,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
