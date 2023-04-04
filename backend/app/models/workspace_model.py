@@ -10,6 +10,9 @@ from .dictionary_model import Dictionary
 class WorkspaceBase(SQLModel):
     title: Optional[str] = Field(nullable=False)
     description: Optional[str] = Field(nullable=False)
+    location_value: Optional[str] = Field(nullable=False)
+    longtitude: Optional[float] = Field(nullable=False)
+    latitude: Optional[float] = Field(nullable=False)
 
 
 class Workspace(BaseUUIDModel, WorkspaceBase, table=True):    

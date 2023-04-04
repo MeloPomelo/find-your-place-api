@@ -6,10 +6,7 @@ from typing import Optional
 
 
 class ImageMediaBase(SQLModel):
-    file_format: Optional[str]
-    width: Optional[int]
-    height: Optional[int]
-
+    pass
 
 class ImageMedia(BaseUUIDModel, ImageMediaBase, table=True):
     workspace: Optional["Workspace"] = Relationship(

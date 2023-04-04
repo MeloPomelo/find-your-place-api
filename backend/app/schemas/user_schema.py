@@ -1,11 +1,16 @@
 from uuid import UUID
 from typing import Optional, List
+from pydantic import BaseModel
 from app.models.users_model import UserBase
 
 
 '''
  Стандартная реализация
 '''
+
+class LoginSchema(BaseModel):
+    username: Optional[str]
+    password: Optional[str]
 
 class UserCreate(UserBase):
     password: Optional[str]

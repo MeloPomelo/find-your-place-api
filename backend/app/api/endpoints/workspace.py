@@ -19,8 +19,10 @@ from app.models.users_model import User
 from app.models.workspace_model import Workspace
 from app.models.image_media_model import ImageMedia
 from app.models.comment_model import Comment
-from app.schemas.role_schema import RoleEnum
 from app.crud import workspace_crud as crud 
+from app.crud import image_media_crud
+from app.schemas.role_schema import RoleEnum
+from app.schemas.media_schema import MediaCreate
 from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
@@ -34,12 +36,7 @@ from app.schemas.response_schemas import (
     DeleteResponseBase,
     create_response,
 )
-from app.schemas.media_schema import MediaCreate
-from app.schemas.comment_schema import (
-    CommentCreate,
-    CommentUpdate,
-    CommentRead
-)
+
 
 router = APIRouter()
 
@@ -69,7 +66,7 @@ async def get_workspace_by_id(
     return create_response(data=workspace)
 
 
-@router.post("/create_workspace")
+@router.post("")
 async def create_workspace(
     workspace: WorkspaceCreate,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin, RoleEnum.user])),
@@ -77,13 +74,18 @@ async def create_workspace(
     """
     Create a new workspace
     """
-    workspace = await crud.workspace.create(obj_in=workspace)
-    
+    new_workspace = await crud.workspace.create(obj_in=workspace)
 
-    return create_response(data=workspace)
+    for image_id in workspace.images_id:
+        image = await image_media_crud.image_media.get(id=image_id)
+        if not image: 
+             raise HTTPException(status_code=404, detail="Image not found")
+        await crud.workspace.add_image_to_workspace(workspace_id=new_workspace.id, image_id=image_id)
+
+    return create_response(data=new_workspace) 
 
 
-@router.put("/update_workspace")
+@router.put("/{workspace_id}")
 async def update_workspace(
     workspace_id: UUID,
     workspace: WorkspaceUpdate,
@@ -99,7 +101,7 @@ async def update_workspace(
     return create_response(data=workspace_updated)
 
 
-@router.delete("/delete_workspace")
+@router.delete("/{workspace_id}")
 async def delete_workspace(
     workspace_id: UUID,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
@@ -114,11 +116,8 @@ async def delete_workspace(
     return create_response(workspace)
 
 
-@router.post("/add_workspace_image")
-async def add_workspace_image(
-    workspace_id: UUID,
-    title: Optional[str] = Body(None),
-    description: Optional[str] = Body(None),
+@router.post("/upload_image")
+async def upload_image(
     image_file: UploadFile = File(...),
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin, RoleEnum.user])),
     minio_client: MinioClient = Depends(deps.minio_auth),
@@ -135,15 +134,11 @@ async def add_workspace_image(
         )
         
         media = MediaCreate(
-            title=title, description=description, path=data_file.file_name
+            path=data_file.file_name
         )
 
-        image_media = await crud.workspace.add_photo(
-            workspace_id=workspace_id,
+        image_media = await image_media_crud.image_media.upload_image(
             image=media,
-            heigth=image_modified.height,
-            width=image_modified.width,
-            file_format=image_modified.file_format,
         )
 
         return create_response(data=image_media)
@@ -151,15 +146,3 @@ async def add_workspace_image(
         print(e)
         return Response("Internal server error", status_code=500)
     
-
-@router.post("/add_comment")
-async def add_comment(
-    workspace_id: UUID,
-    comment: CommentCreate,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.user, RoleEnum.admin])),
-) -> PostResponseBase[CommentRead]:
-    """
-    Create a comment to workspace
-    """
-    new_comment = await crud.workspace.add_comment(workspace_id=workspace_id, user_id=current_user.id, comment=comment)
-    return create_response(data=new_comment)
