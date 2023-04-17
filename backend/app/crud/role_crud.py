@@ -1,11 +1,12 @@
 from typing import Optional
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel import select
+from uuid import UUID
+
 from app.schemas.role_schema import RoleCreate, RoleUpdate
 from app.models.role_model import Role
 from app.models.users_model import User
 from app.crud.base_crud import CRUDBase
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import select
-from uuid import UUID
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):

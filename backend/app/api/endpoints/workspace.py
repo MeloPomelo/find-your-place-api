@@ -37,6 +37,8 @@ from app.schemas.response_schemas import (
     create_response,
 )
 
+from app.schemas.category_schema import CategoryRead
+from app.crud.category_crud import category
 
 router = APIRouter()
 

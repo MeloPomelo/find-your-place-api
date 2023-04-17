@@ -1,7 +1,9 @@
 from typing import Dict, List, Union
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.crud import role_crud, user_crud
+from app.crud import role_crud, user_crud, category_crud, parameter_crud
 from app.schemas.role_schema import RoleCreate
+from app.schemas.category_schema import CategoryCreate
+from app.schemas.parameter_schema import ParameterCreate
 from app.core.config import settings
 from app.schemas.user_schema import UserCreateWithRole
 
@@ -34,9 +36,29 @@ users: List[Dict[str, Union[str, UserCreateWithRole]]] = [
     },
 ]
 
+categories: List[CategoryCreate] = [
+    CategoryCreate(title="Комнаты"),
+    CategoryCreate(title="Дополнительно"),
+    CategoryCreate(title="Технические особенности"),
+]
+
+
+parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
+    {
+        "data": ParameterCreate(
+            title="Печать материалов"
+        ),
+        "category": "Технические особенности"
+    },
+    {
+        "data": ParameterCreate(
+            title="Wi-Fi"
+        ),
+        "category": "Технические особенности"
+    }
+]
 
 async def init_db(db_session: AsyncSession) -> None:
-
     for role in roles:
         role_current = await role_crud.role.get_role_by_name(
             name=role.name, db_session=db_session
@@ -55,6 +77,21 @@ async def init_db(db_session: AsyncSession) -> None:
             user["data"].role_id = role.id
             await user_crud.user.create_with_role(obj_in=user["data"], db_session=db_session)
 
+    for category in categories:
+        category_current = await category_crud.category.get_category_by_name(
+            title=category.title, db_session=db_session
+        )
+        if not category_current:
+            await category_crud.category.create(obj_in=category, db_session=db_session)
    
 
-   
+    for parameter in parameters:
+        parameter_current = await parameter_crud.parameter.get_parameter_by_name(
+            title=parameter["data"].title, db_session=db_session
+        )
+        category = await category_crud.category.get_category_by_name(
+            title=parameter["category"], db_session=db_session
+        )
+        if not parameter_current:
+            parameter["data"].category_id = category.id
+            await parameter_crud.parameter.create(obj_in=parameter["data"], db_session=db_session)
