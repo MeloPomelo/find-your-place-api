@@ -26,6 +26,10 @@ class User(BaseUUIDModel, UserBase, table=True):
     )
     role_id: Optional[UUID] = Field(default=None, foreign_key="Role.id")
 
+    workspaces: List["Workspace"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
     comments: List["Comment"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
     )

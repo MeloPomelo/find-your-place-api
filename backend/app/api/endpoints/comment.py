@@ -26,7 +26,6 @@ from app.schemas.response_schemas import (
 )
 from app.schemas.comment_schema import (
     CommentCreate,
-    CommentCreateWithUser,
     CommentUpdate,
     CommentRead
 )
@@ -56,15 +55,15 @@ async def create_comment(
     """
     Add a comment on the space
     """
-    comment_with_user = CommentCreateWithUser(
-        text=comment.text,
-        advantages=comment.advantages,
-        disadnatages=comment.disadnatages,
-        rating=comment.rating,
-        user_id=current_user.id,
-        workspace_id=comment.workspace_id
-    )
-    new_comment = await crud.comment.create(obj_in=comment_with_user)
+    # comment_with_user = CommentCreateWithUser(
+    #     text=comment.text,
+    #     advantages=comment.advantages,
+    #     disadnatages=comment.disadnatages,
+    #     rating=comment.rating,
+    #     user_id=current_user.id,
+    #     workspace_id=comment.workspace_id
+    # )
+    new_comment = await crud.comment.create(obj_in=comment)
     return create_response(data=new_comment)
 
 

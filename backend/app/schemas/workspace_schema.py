@@ -11,6 +11,7 @@ from app.schemas.response_schemas import PostResponseBase
 
 class WorkspaceCreate(WorkspaceBase):
     # images: Optional[List[PostResponseBase[ImageMedia]]] = []
+    user_id: UUID
     images_id: Optional[List[UUID]] = []
     parameters: Optional[List[str]] = []
 

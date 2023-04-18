@@ -1,9 +1,10 @@
 from typing import Dict, List, Union
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.crud import role_crud, user_crud, category_crud, parameter_crud
+from app.crud import role_crud, user_crud, category_crud, parameter_crud, status_crud
 from app.schemas.role_schema import RoleCreate
 from app.schemas.category_schema import CategoryCreate
 from app.schemas.parameter_schema import ParameterCreate
+from app.schemas.status_schema import StatusCreate
 from app.core.config import settings
 from app.schemas.user_schema import UserCreateWithRole
 
@@ -40,6 +41,16 @@ categories: List[CategoryCreate] = [
     CategoryCreate(title="Комнаты"),
     CategoryCreate(title="Дополнительно"),
     CategoryCreate(title="Технические особенности"),
+]
+
+
+statuses: List[StatusCreate] = [
+    StatusCreate(title="На рассмотрении", tag="workspace_status"),
+    StatusCreate(title="Отклонено", tag="workspace_status"),
+    StatusCreate(title="Подтверждено", tag="workspace_status"),
+    StatusCreate(title="Прошедшее", tag="visit_status"),
+    StatusCreate(title="Активное", tag="visit_status"),
+    StatusCreate(title="Предстоящее", tag="visit_status"),
 ]
 
 
@@ -95,3 +106,10 @@ async def init_db(db_session: AsyncSession) -> None:
         if not parameter_current:
             parameter["data"].category_id = category.id
             await parameter_crud.parameter.create(obj_in=parameter["data"], db_session=db_session)
+
+    for status in statuses:
+        status_current = await status_crud.status.get_status_by_title(
+            title=status.title, db_session=db_session
+        )
+        if not status_current:
+            await status_crud.status.create(obj_in=status, db_session=db_session)
