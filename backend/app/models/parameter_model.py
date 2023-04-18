@@ -15,8 +15,7 @@ class Parameter(BaseUUIDModel, ParameterBase, table=True):
     )
     category_id: Optional[UUID] = Field(default=None, foreign_key="Category.id")
 
-    workspace: Optional["Workspace"] = Relationship(
-        back_populates="parameters", sa_relationship_kwargs={"lazy": "joined"}
+    workspaces: List["WorkspaceParameters"] = Relationship(
+        back_populates="parameter", sa_relationship_kwargs={"lazy": "selectin"}
     )
-    workspace_id: Optional[UUID] = Field(default=None, foreign_key="Workspace.id")
 

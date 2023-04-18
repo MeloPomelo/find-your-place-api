@@ -25,27 +25,24 @@ class Workspace(BaseUUIDModel, WorkspaceBase, table=True):
         back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
-    parameters: List["Parameter"] = Relationship(
+    parameters: List["WorkspaceParameters"] = Relationship(
         back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
     ) 
 
 
-# class WorkspaceParameters(SQLModel, table=True):
-#     workspace: Optional["Workspace"] = Relationship(
-#         back_populates="parameters", sa_relationship_kwargs={"lazy": "joined"}
-#     )
+class WorkspaceParameters(BaseUUIDModel, table=True):
+    workspace: Optional["Workspace"] = Relationship(
+        back_populates="parameters", sa_relationship_kwargs={"lazy": "joined"}
+    )
 
-#     workspace_id: Optional[UUID] = Field(
-#         default=None, foreign_key="Workspace.id", primary_key=True
-#     ) 
+    workspace_id: Optional[UUID] = Field(
+        default=None, foreign_key="Workspace.id", primary_key=True
+    ) 
 
-#     parameter: Dictionary = Relationship(
-#         sa_relationship_kwargs={
-#             "lazy": "joined",
-#             "primaryjoin": "WorkspaceParameters.parameter_id==Dictionary.id",
-#         }
-#     )
+    parameter: Optional["Parameter"] = Relationship(
+        back_populates="workspaces", sa_relationship_kwargs={"lazy": "joined"}
+    )
 
-#     parameter_id: Optional[UUID] = Field(
-#         default=None, foreign_key="Dictionary.id"
-#     )
+    parameter_id: Optional[UUID] = Field(
+        default=None, foreign_key="Parameter.id", primary_key=True
+    )

@@ -41,6 +41,22 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         response = await db_session.execute(query)
         return response.scalar_one_or_none()
     
+
+    async def get_multi(
+        self,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        query: Optional[Union[T, Select[T]]] = None,
+        db_session: Optional[AsyncSession] = None,
+    ) -> List[ModelType]:
+        db_session = db_session or db.session
+        if query is None:
+            query = select(self.model).offset(skip).limit(limit).order_by(self.model.id)
+        response = await db_session.execute(query)
+        return response.scalars().all()
+        
+
     async def get_multi_paginated(
         self,
         *,
