@@ -2,6 +2,7 @@ from io import BytesIO
 from typing import Optional, List
 from uuid import UUID
 from fastapi_pagination import Params
+from fastapi_async_sqlalchemy import db
 from fastapi import (
     APIRouter, 
     Depends, 
@@ -21,6 +22,7 @@ from app.models.image_media_model import ImageMedia
 from app.models.comment_model import Comment
 from app.crud import workspace_crud as crud 
 from app.crud import image_media_crud
+from app.crud import parameter_crud
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
 from app.schemas.workspace_schema import (
@@ -81,8 +83,14 @@ async def create_workspace(
     for image_id in workspace.images_id:
         image = await image_media_crud.image_media.get(id=image_id)
         if not image: 
-             raise HTTPException(status_code=404, detail="Image not found")
-        await crud.workspace.add_image_to_workspace(workspace_id=new_workspace.id, image_id=image_id)
+            raise HTTPException(status_code=404, detail="Image not found")
+        new_workspace = await crud.workspace.add_image_to_workspace(workspace=new_workspace, image_id=image_id)
+
+    for paramter_title in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_name(title=paramter_title, db_session=db.session)
+        if not paramter:
+            raise HTTPException(status_code=404, detail="Parameter not found")
+        new_workspace = await crud.workspace.add_parameters_to_workspace(workspace=new_workspace, parameter=paramter)
 
     return create_response(data=new_workspace) 
 
