@@ -31,6 +31,11 @@ class PageBase(Page[T], Generic[T]):
     next_page: Optional[int]
 
 
+# class ResponseList():
+#     message: str = ""
+#     meta: Dict = {}
+#     data: Optional[T]
+
 class ResponsePage(AbstractPage[T], Generic[T]):
     message: str = ""
     meta: Dict = {}
