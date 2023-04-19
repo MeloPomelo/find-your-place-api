@@ -1,11 +1,12 @@
 from sqlmodel import SQLModel, Relationship
-from typing import List
+from typing import List, Optional
 
 from app.models.base_model import BaseUUIDModel
 
 
 class StatusBase(SQLModel):
-    title: str
+    name: str
+    code_name: Optional[str]
     tag: str
 
 

@@ -20,9 +20,12 @@ from app.models.users_model import User
 from app.models.workspace_model import Workspace
 from app.models.image_media_model import ImageMedia
 from app.models.comment_model import Comment
-from app.crud import workspace_crud as crud 
-from app.crud import image_media_crud
-from app.crud import parameter_crud
+from app.crud import (
+    workspace_crud,
+    image_media_crud,
+    parameter_crud,
+    status_crud
+)
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
 from app.schemas.workspace_schema import (
@@ -52,7 +55,7 @@ async def get_workspace_list(
     """
     Gets a paginated list of workspaces
     """
-    workspaces = await crud.workspace.get_multi_paginated(params=params)
+    workspaces = await workspace_crud.workspace.get_multi_paginated(params=params)
     return create_response(data=workspaces)
 
 
@@ -64,7 +67,7 @@ async def get_workspace_by_id(
     """
     Gets a workspace by its id
     """
-    workspace = await crud.workspace.get(id=workspace_id)
+    workspace = await workspace_crud.workspace.get(id=workspace_id)
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
     return create_response(data=workspace)
@@ -78,19 +81,25 @@ async def create_workspace(
     """
     Create a new workspace
     """
-    new_workspace = await crud.workspace.create(obj_in=workspace)
+    workspace.user_id = current_user.id
+    new_workspace = await workspace_crud.workspace.create(obj_in=workspace)
+
+    status = await status_crud.status.get_status_by_code_name(code_name="handling", db_session=db.session)
+    if not status:
+        raise HTTPException(status_code=404, detail="Status not found")
+    new_workspace = await workspace_crud.workspace.set_status(workspace=new_workspace, status=status)
 
     for image_id in workspace.images_id:
         image = await image_media_crud.image_media.get(id=image_id)
         if not image: 
             raise HTTPException(status_code=404, detail="Image not found")
-        new_workspace = await crud.workspace.add_image_to_workspace(workspace=new_workspace, image_id=image_id)
+        new_workspace = await workspace_crud.workspace.add_image_to_workspace(workspace=new_workspace, image_id=image_id)
 
-    for paramter_title in workspace.parameters:
-        paramter = await parameter_crud.parameter.get_parameter_by_name(title=paramter_title, db_session=db.session)
+    for paramter_name in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_name(name=paramter_name, db_session=db.session)
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
-        new_workspace = await crud.workspace.add_parameters_to_workspace(workspace=new_workspace, parameter=paramter)
+        new_workspace = await workspace_crud.workspace.add_parameters_to_workspace(workspace=new_workspace, parameter=paramter)
 
     return create_response(data=new_workspace) 
 
@@ -104,10 +113,10 @@ async def update_workspace(
     """
     Upadate a workspace
     """
-    current_workspace = await crud.workspace.get(id=workspace_id)
+    current_workspace = await workspace_crud.workspace.get(id=workspace_id)
     if not current_workspace:
         raise HTTPException(status_code=404, detail="Worksapce not found")
-    workspace_updated = await crud.workspace.update(obj_new=workspace, obj_current=current_workspace)
+    workspace_updated = await workspace_crud.workspace.update(obj_new=workspace, obj_current=current_workspace)
     return create_response(data=workspace_updated)
 
 
@@ -119,10 +128,10 @@ async def delete_workspace(
     """
     Delete a workspace
     """
-    current_workspace = await crud.workspace.get(id=workspace_id)
+    current_workspace = await workspace_crud.workspace.get(id=workspace_id)
     if not current_workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
-    workspace = await crud.workspace.remove(id=workspace_id)
+    workspace = await workspace_crud.workspace.remove(id=workspace_id)
     return create_response(workspace)
 
 

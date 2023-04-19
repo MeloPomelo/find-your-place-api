@@ -38,32 +38,56 @@ users: List[Dict[str, Union[str, UserCreateWithRole]]] = [
 ]
 
 categories: List[CategoryCreate] = [
-    CategoryCreate(title="Комнаты"),
-    CategoryCreate(title="Дополнительно"),
-    CategoryCreate(title="Технические особенности"),
+    CategoryCreate(name="Комнаты"),
+    CategoryCreate(name="Дополнительно"),
+    CategoryCreate(name="Технические особенности"),
 ]
 
 
 statuses: List[StatusCreate] = [
-    StatusCreate(title="На рассмотрении", tag="workspace_status"),
-    StatusCreate(title="Отклонено", tag="workspace_status"),
-    StatusCreate(title="Подтверждено", tag="workspace_status"),
-    StatusCreate(title="Прошедшее", tag="visit_status"),
-    StatusCreate(title="Активное", tag="visit_status"),
-    StatusCreate(title="Предстоящее", tag="visit_status"),
+    StatusCreate(
+        name="Обработка формы", 
+        code_name="handling", 
+        tag="workspace_status",
+    ),
+    StatusCreate(
+        name="Форма отклонена", 
+        code_name="canceled", 
+        tag="workspace_status",
+    ),
+    StatusCreate(
+        name="Подтверждено", 
+        code_name="approved", 
+        tag="workspace_status",
+    ),
+    StatusCreate(
+        name="Прошедшее",
+        code_name="not active", 
+        tag="visit_status",
+    ),
+    StatusCreate(
+        name="Активное", 
+        code_name="active", 
+        tag="visit_status",
+    ),
+    StatusCreate(
+        name="Предстоящее",
+        code_name="future",  
+        tag="visit_status",
+    ),
 ]
 
 
 parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     {
         "data": ParameterCreate(
-            title="Печать материалов"
+            name="Печать материалов"
         ),
         "category": "Технические особенности"
     },
     {
         "data": ParameterCreate(
-            title="Wi-Fi"
+            name="Wi-Fi"
         ),
         "category": "Технические особенности"
     }
@@ -90,7 +114,7 @@ async def init_db(db_session: AsyncSession) -> None:
 
     for category in categories:
         category_current = await category_crud.category.get_category_by_name(
-            title=category.title, db_session=db_session
+            name=category.name, db_session=db_session
         )
         if not category_current:
             await category_crud.category.create(obj_in=category, db_session=db_session)
@@ -98,18 +122,18 @@ async def init_db(db_session: AsyncSession) -> None:
 
     for parameter in parameters:
         parameter_current = await parameter_crud.parameter.get_parameter_by_name(
-            title=parameter["data"].title, db_session=db_session
+            name=parameter["data"].name, db_session=db_session
         )
         category = await category_crud.category.get_category_by_name(
-            title=parameter["category"], db_session=db_session
+            name=parameter["category"], db_session=db_session
         )
         if not parameter_current:
             parameter["data"].category_id = category.id
             await parameter_crud.parameter.create(obj_in=parameter["data"], db_session=db_session)
 
     for status in statuses:
-        status_current = await status_crud.status.get_status_by_title(
-            title=status.title, db_session=db_session
+        status_current = await status_crud.status.get_status_by_code_name(
+            name=status.code_name, db_session=db_session
         )
         if not status_current:
             await status_crud.status.create(obj_in=status, db_session=db_session)

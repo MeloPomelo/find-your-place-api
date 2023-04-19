@@ -56,14 +56,6 @@ async def create_comment(
     """
     Add a comment on the space
     """
-    # comment_with_user = CommentCreateWithUser(
-    #     text=comment.text,
-    #     advantages=comment.advantages,
-    #     disadnatages=comment.disadnatages,
-    #     rating=comment.rating,
-    #     user_id=current_user.id,
-    #     workspace_id=comment.workspace_id
-    # )
     new_comment = await crud.comment.create(obj_in=comment)
     await workspace.rating_calculation(workspace_id=comment.workspace_id, rating=comment.rating)
     return create_response(data=new_comment)

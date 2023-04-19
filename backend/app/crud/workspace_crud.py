@@ -8,6 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.models.workspace_model import Workspace
 from app.models.comment_model import Comment
 from app.models.parameter_model import Parameter
+from app.models.status_model import Status
 from app.schemas.workspace_schema import WorkspaceCreate, WorkspaceUpdate
 from app.schemas.comment_schema import CommentCreate
 from app.crud.base_crud import CRUDBase
@@ -22,7 +23,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         workspace: Workspace,
         image_id: int,
         db_session: Optional[AsyncSession] = None
-    ):
+    ) -> Workspace:
         db_session = db_session or db.session
         db_image = await image_media.get(id=image_id)
         workspace.images.append(db_image)
@@ -37,13 +38,29 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         workspace: Workspace,
         parameter: Parameter,
         db_session: Optional[AsyncSession] = None
-    ):
+    ) -> Workspace:
         db_session = db_session or db.session
         workspace.parameters.append(parameter)
         db_session.add(workspace)
         await db_session.commit()
         await db_session.refresh(workspace)
         return workspace
+
+
+    async def set_status(
+        self,
+        *,
+        workspace: Workspace,
+        status: Status,
+        db_session: Optional[AsyncSession] = None
+    ) -> Workspace:
+        db_session = db_session or db.session
+        workspace.status_id = status.id
+        db_session.add(workspace)
+        await db_session.commit()
+        await db_session.refresh(workspace)
+        return workspace
+
 
     async def rating_calculation(
         self,
@@ -53,6 +70,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         flag: bool = True,
         db_session: Optional[AsyncSession] = None
     ):
+        # Требует доработки
         db_session = db_session or db.session
         curr_workspace = await self.get(id=workspace_id)
         if flag:
@@ -67,5 +85,6 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         db_session.add(curr_workspace)
         await db_session.commit()
         await db_session.refresh(curr_workspace)
+
 
 workspace = CRUDWorkspace(Workspace)

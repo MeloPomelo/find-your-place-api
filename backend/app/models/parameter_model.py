@@ -6,8 +6,8 @@ from app.models.base_model import BaseUUIDModel
 from app.models.workspace_model import WorkspaceParameterLink
 
 class ParameterBase(SQLModel):
-    title: str
-
+    name: str
+    code_name: Optional[str]
 
 class Parameter(BaseUUIDModel, ParameterBase, table=True):
     category: Optional["Category"] = Relationship(
