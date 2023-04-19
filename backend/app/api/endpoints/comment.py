@@ -14,7 +14,8 @@ from fastapi import (
 )
 from app.api.endpoints import deps
 from app.models.users_model import User
-from app.crud import comment_crud as crud 
+from app.crud import comment_crud as crud
+from app.crud.workspace_crud import workspace
 from app.schemas.role_schema import RoleEnum
 from app.schemas.response_schemas import (
     GetResponseBase,
@@ -64,6 +65,7 @@ async def create_comment(
     #     workspace_id=comment.workspace_id
     # )
     new_comment = await crud.comment.create(obj_in=comment)
+    await workspace.rating_calculation(workspace_id=comment.workspace_id, rating=comment.rating)
     return create_response(data=new_comment)
 
 
@@ -84,7 +86,7 @@ async def update_comment(
 
 
 @router.delete("/{comment_id}")
-async def delete_workspace(
+async def delete_comment(
     comment_id: UUID,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> DeleteResponseBase[CommentRead]:
@@ -94,5 +96,6 @@ async def delete_workspace(
     current_comment = await crud.comment.get(id=comment_id)
     if not current_comment:
         raise HTTPException(status_code=404, detail="Comment not found")
+    await workspace.rating_calculation(workspace_id=current_comment.workspace_id, rating=current_comment.rating, flag=False)
     comment = await crud.comment.remove(id=comment_id)
     return create_response(comment)

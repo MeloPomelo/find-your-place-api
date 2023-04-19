@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Optional, List
+from typing import Optional, List, Union
 from datetime import datetime
 from fastapi_async_sqlalchemy import db
 from sqlmodel import select, func, and_
@@ -45,5 +45,27 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         await db_session.refresh(workspace)
         return workspace
 
+    async def rating_calculation(
+        self,
+        *,
+        workspace_id: UUID,
+        rating: int,
+        flag: bool = True,
+        db_session: Optional[AsyncSession] = None
+    ):
+        db_session = db_session or db.session
+        curr_workspace = await self.get(id=workspace_id)
+        if flag:
+            curr_workspace.sum_rating += rating
+            curr_workspace.rating = round(curr_workspace.sum_rating / (len(curr_workspace.comments) + 1), 1)
+        else:
+            curr_workspace.sum_rating -= rating
+            if len(curr_workspace.comments) == 1:
+                curr_workspace.rating = 0
+            else:
+                curr_workspace.rating = round(curr_workspace.sum_rating / (len(curr_workspace.comments) - 1), 1)        
+        db_session.add(curr_workspace)
+        await db_session.commit()
+        await db_session.refresh(curr_workspace)
 
 workspace = CRUDWorkspace(Workspace)
