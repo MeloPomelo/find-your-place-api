@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Optional, List
+from typing import Optional, List, Union
 from uuid import UUID
 from fastapi_pagination import Params
 from fastapi_async_sqlalchemy import db
@@ -55,6 +55,21 @@ async def get_workspace_list(
     workspaces = await crud.workspace.get_multi_paginated(params=params)
     return create_response(data=workspaces)
 
+
+@router.get("/get_by_parameters")
+async def get_by_parameters(
+    rooms: Union[List[str], None] = Query(default=None),
+    additional: Union[List[str], None] = Query(default=None),
+    features: Union[List[str], None] = Query(default=None),
+    params: Params = Depends(),
+) -> GetResponsePaginated[WorkspaceRead]:
+    query_items = {}
+    query_items['rooms'] = rooms
+    query_items['additional'] = additional
+    query_items['features'] = features
+    print(query_items)
+    workspaces = await crud.workspace.get_multi_paginated(params=params)
+    return create_response(data=workspaces)
 
 
 @router.get("/{workspace_id}")
@@ -153,6 +168,5 @@ async def upload_image(
 
         return create_response(data=image_media)
     except Exception as e:
-        print(e)
         return Response("Internal server error", status_code=500)
     
