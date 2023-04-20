@@ -37,7 +37,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello there!"}
+    return {"message": "Хе хе хе, потерялся?"}
 
 
 async def add_postgresql_extension() -> None:

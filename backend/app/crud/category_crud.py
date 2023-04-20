@@ -11,10 +11,10 @@ from app.schemas.category_schema import CategoryCreate, CategoryUpdate
 
 class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
     async def get_category_by_name(
-        self, *, title: str, db_session: Optional[AsyncSession] = None
+        self, *, name: str, db_session: Optional[AsyncSession] = None
     ) -> Category:
         db_session = db_session or super().get_db().session
-        role = await db_session.execute(select(Category).where(Category.title == title))
+        role = await db_session.execute(select(Category).where(Category.name == name))
         return role.scalar_one_or_none()
 
     async def add_category_to_parameter(self, *, parameter: Parameter, category_id: UUID) -> Category:

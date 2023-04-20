@@ -10,10 +10,10 @@ from app.crud.base_crud import CRUDBase
 
 class CRUDParameter(CRUDBase[Parameter, ParameterCreate, ParameterUpdate]):
     async def get_parameter_by_name(
-        self, *, title: str, db_session: Optional[AsyncSession] = None
+        self, *, name: str, db_session: Optional[AsyncSession] = None
     ) -> Parameter:
         db_session = db_session or super().get_db().session
-        parameter = await db_session.execute(select(Parameter).where(Parameter.title == title))
+        parameter = await db_session.execute(select(Parameter).where(Parameter.name == name))
         return parameter.scalar_one_or_none()
 
 

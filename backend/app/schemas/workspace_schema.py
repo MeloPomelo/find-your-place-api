@@ -7,6 +7,7 @@ from app.schemas.image_media_schema import ImageMediaRead
 from app.schemas.comment_schema import CommentRead
 from app.schemas.parameter_schema import ParameterRead
 from app.schemas.response_schemas import PostResponseBase
+from app.schemas.status_schema import StatusRead
 
 
 class WorkspaceCreate(WorkspaceBase):
@@ -25,3 +26,4 @@ class WorkspaceRead(WorkspaceBase):
     images:  Optional[List[ImageMediaRead]] = []
     comments: Optional[List[CommentRead]] = []
     parameters: Optional[List[ParameterRead]] = []
+    status: Optional[StatusRead]
