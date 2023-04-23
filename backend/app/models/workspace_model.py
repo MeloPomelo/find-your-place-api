@@ -13,9 +13,8 @@ class WorkspaceBase(SQLModel):
     description: Optional[str] = Field(nullable=False)
     phone_number: Optional[str]
     site_url: Optional[str]
-    rating: Optional[float] = Field(nullable=False, default=0)
     location_value: Optional[str] = Field(nullable=False)
-    longtitude: Optional[float] = Field(nullable=False)
+    longitude: Optional[float] = Field(nullable=False)
     latitude: Optional[float] = Field(nullable=False)
 
 
@@ -29,6 +28,7 @@ class WorkspaceParameterLink(BaseUUIDModel, table=True):
     )
 
 class Workspace(BaseUUIDModel, WorkspaceBase, table=True):  
+    rating: Optional[float] = Field(nullable=False, default=0)
     sum_rating: Optional[int] = Field(nullable=False, default=0)
 
     status: Optional["Status"] = Relationship(

@@ -20,6 +20,7 @@ class WorkspaceUpdate(WorkspaceBase):
 
 
 class WorkspaceRead(WorkspaceBase):
+    rating: int
     images:  Optional[List[ImageMediaRead]] = []
     comments: Optional[List[CommentRead]] = []
     parameters: Optional[List[ParameterRead]] = []
