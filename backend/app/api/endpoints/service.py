@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.exceptions import HTTPException
 from uuid import UUID
 from fastapi_async_sqlalchemy import db
+from fastapi_pagination import Params
 
 from app.api.endpoints import deps
 from app.models.users_model import User
@@ -69,3 +70,14 @@ async def set_workspace_status(
         raise HTTPException(status_code=404, detail="Status not found")
     current_workspace = await workspace.set_status(workspace=current_workspace, status=new_status)
     return create_response(data=current_workspace)
+
+
+@router.get("/workspaces")
+async def get_workspace_list(
+    params: Params = Depends(),
+) -> GetResponsePaginated[WorkspaceRead]:
+    """
+    Gets a paginated list of workspaces
+    """
+    workspaces = await workspace.get_multi_paginated(params=params)
+    return create_response(data=workspaces)

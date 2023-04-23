@@ -81,15 +81,31 @@ statuses: List[StatusCreate] = [
 parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     {
         "data": ParameterCreate(
-            name="Печать материалов"
+            name="Печать материалов",
+            code_name="printer"
         ),
         "category": "Технические особенности",
     },
     {
         "data": ParameterCreate(
-            name="Wi-Fi"
+            name="Wi-Fi",
+            code_name="wi-fi"
         ),
         "category": "Технические особенности"
+    },
+    {
+        "data": ParameterCreate(
+            name="Конференц-зал",
+            code_name="conference room"
+        ),
+        "category": "Комнаты"
+    },
+    {
+        "data": ParameterCreate(
+            name="Чай/Кофе",
+            code_name="service"
+        ),
+        "category": "Дополнительно"
     }
 ]
 
