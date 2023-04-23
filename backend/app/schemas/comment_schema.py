@@ -6,13 +6,12 @@ from app.schemas.image_media_schema import ImageMediaRead
 
 
 class CommentCreate(CommentBase):
-    user_id: UUID
     workspace_id: UUID
-
 
 class CommentUpdate(CommentBase):
     pass
 
-
 class CommentRead(CommentBase):
     id: UUID
+    workspace_id: UUID
+    user_id: UUID

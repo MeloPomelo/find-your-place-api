@@ -83,7 +83,7 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
         "data": ParameterCreate(
             name="Печать материалов"
         ),
-        "category": "Технические особенности"
+        "category": "Технические особенности",
     },
     {
         "data": ParameterCreate(
@@ -133,7 +133,7 @@ async def init_db(db_session: AsyncSession) -> None:
 
     for status in statuses:
         status_current = await status_crud.status.get_status_by_code_name(
-            name=status.code_name, db_session=db_session
+            code_name=status.code_name, db_session=db_session
         )
         if not status_current:
             await status_crud.status.create(obj_in=status, db_session=db_session)

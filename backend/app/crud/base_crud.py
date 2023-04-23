@@ -73,14 +73,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self,
         *,
         obj_in: Union[CreateSchemaType, ModelType],
-        # created_by_id: Optional[Union[UUID, str]] = None,
+        user_id: Optional[Union[UUID, str]] = None,
         db_session: Optional[AsyncSession] = None,
     ) -> ModelType:
         db_session = db_session or db.session
         db_obj = self.model.from_orm(obj_in)  # type: ignore
-        # if created_by_id:
-        #     db_obj.created_by_id = created_by_id
-
+        if user_id:
+            db_obj.user_id = user_id
         try:
             db_session.add(db_obj)
             await db_session.commit()

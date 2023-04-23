@@ -81,8 +81,7 @@ async def create_workspace(
     """
     Create a new workspace
     """
-    workspace.user_id = current_user.id
-    new_workspace = await workspace_crud.workspace.create(obj_in=workspace)
+    new_workspace = await workspace_crud.workspace.create(obj_in=workspace, user_id=current_user.id)
 
     status = await status_crud.status.get_status_by_code_name(code_name="handling", db_session=db.session)
     if not status:

@@ -11,19 +11,18 @@ from app.schemas.status_schema import StatusRead
 
 
 class WorkspaceCreate(WorkspaceBase):
-    # images: Optional[List[PostResponseBase[ImageMedia]]] = []
-    user_id: UUID
     images_id: Optional[List[UUID]] = []
     parameters: Optional[List[str]] = []
-
+    
 
 class WorkspaceUpdate(WorkspaceBase):
     pass
 
 
 class WorkspaceRead(WorkspaceBase):
-    id: UUID
     images:  Optional[List[ImageMediaRead]] = []
     comments: Optional[List[CommentRead]] = []
     parameters: Optional[List[ParameterRead]] = []
+    id: UUID
+    user_id: UUID
     status: Optional[StatusRead]
