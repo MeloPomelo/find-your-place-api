@@ -81,15 +81,31 @@ statuses: List[StatusCreate] = [
 parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     {
         "data": ParameterCreate(
-            name="Печать материалов"
+            name="Печать материалов",
+            code_name="printer"
         ),
         "category": "Технические особенности"
     },
     {
         "data": ParameterCreate(
-            name="Wi-Fi"
+            name="Wi-Fi",
+            code_name="wi-fi"
         ),
         "category": "Технические особенности"
+    },
+    {
+        "data": ParameterCreate(
+            name="Конференц-зал",
+            code_name="conference room"
+        ),
+        "category": "Комнаты"
+    },
+    {
+        "data": ParameterCreate(
+            name="Чай/Кофе",
+            code_name="service"
+        ),
+        "category": "Дополнительно"
     }
 ]
 
@@ -133,7 +149,7 @@ async def init_db(db_session: AsyncSession) -> None:
 
     for status in statuses:
         status_current = await status_crud.status.get_status_by_code_name(
-            name=status.code_name, db_session=db_session
+            code_name=status.code_name, db_session=db_session
         )
         if not status_current:
             await status_crud.status.create(obj_in=status, db_session=db_session)

@@ -1,6 +1,7 @@
 from io import BytesIO
 from typing import Optional, List, Union
 from uuid import UUID
+from sqlmodel import select, and_
 from fastapi_pagination import Params
 from fastapi_async_sqlalchemy import db
 from fastapi import (
@@ -20,6 +21,7 @@ from app.models.users_model import User
 from app.models.workspace_model import Workspace
 from app.models.image_media_model import ImageMedia
 from app.models.comment_model import Comment
+from app.models.parameter_model import Parameter
 from app.crud import (
     workspace_crud,
     image_media_crud,
@@ -49,17 +51,6 @@ router = APIRouter()
 
 
 @router.get("")
-async def get_workspace_list(
-    params: Params = Depends(),
-) -> GetResponsePaginated[WorkspaceRead]:
-    """
-    Gets a paginated list of workspaces
-    """
-    workspaces = await workspace_crud.workspace.get_multi_paginated(params=params)
-    return create_response(data=workspaces)
-
-
-@router.get("/get_by_parameters")
 async def get_by_parameters(
     rooms: Union[List[str], None] = Query(default=None),
     additional: Union[List[str], None] = Query(default=None),
@@ -70,8 +61,12 @@ async def get_by_parameters(
     query_items['rooms'] = rooms
     query_items['additional'] = additional
     query_items['features'] = features
-    print(query_items)
-    workspaces = await crud.workspace.get_multi_paginated(params=params)
+    a = []
+    for key in query_items.keys():
+        if query_items[key]:
+            a += [Workspace.parameters.property.mapper.c.code_name == i for i in query_items[key]]
+    query = select(Workspace).join(Workspace.parameters).where(and_(*a))
+    workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
 
