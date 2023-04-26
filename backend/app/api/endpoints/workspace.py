@@ -65,7 +65,10 @@ async def get_by_parameters(
     for key in query_items.keys():
         if query_items[key]:
             a += [Workspace.parameters.property.mapper.c.code_name == i for i in query_items[key]]
-    query = select(Workspace).join(Workspace.parameters).where(and_(*a))
+    if a:
+        query = select(Workspace).join(Workspace.parameters).where(and_(*a))
+    else:
+        query = select(Workspace)
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
