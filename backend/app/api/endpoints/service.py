@@ -62,7 +62,8 @@ async def get_statuses_list(
 @router.put("/set_status")
 async def set_workspace_status(
     workspace_id: UUID,
-    code_name: str
+    code_name: str,
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> PutResponseBase[WorkspaceRead]:
     current_workspace = await workspace.get(id=workspace_id)
     new_status = await status.get_status_by_code_name(code_name=code_name, db_session=db.session)
@@ -75,6 +76,7 @@ async def set_workspace_status(
 @router.get("/workspaces")
 async def get_workspace_list(
     params: Params = Depends(),
+    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> GetResponsePaginated[WorkspaceRead]:
     """
     Gets a paginated list of workspaces
