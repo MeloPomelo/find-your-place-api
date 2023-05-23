@@ -5,10 +5,7 @@ from fastapi_async_sqlalchemy import db
 from sqlmodel import select, func, and_
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.models.workspace_model import Workspace
-from app.models.comment_model import Comment
-from app.models.parameter_model import Parameter
-from app.models.status_model import Status
+from app.models import Workspace, Parameter, Status
 from app.schemas.workspace_schema import WorkspaceCreate, WorkspaceUpdate
 from app.schemas.comment_schema import CommentCreate
 from app.crud.base_crud import CRUDBase
@@ -32,7 +29,25 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         await db_session.refresh(workspace)
         return workspace
     
-    async def add_parameters_to_workspace(
+
+    async def remove_image_from_workspace(
+        self,
+        *,
+        workspace: Workspace,
+        image_id: int,
+        db_session: Optional[AsyncSession] = None
+    ) -> Workspace:
+        db_session = db_session or db.session
+        db_image = await image_media.get(id=image_id)
+        workspace.images.remove(db_image)
+        db_session.add(workspace)
+        await image_media.remove(id=image_id)
+        await db_session.commit()
+        await db_session.refresh(workspace)
+        return workspace
+
+
+    async def add_parameter_to_workspace(
         self,
         *,
         workspace: Workspace,
@@ -41,6 +56,21 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
     ) -> Workspace:
         db_session = db_session or db.session
         workspace.parameters.append(parameter)
+        db_session.add(workspace)
+        await db_session.commit()
+        await db_session.refresh(workspace)
+        return workspace
+
+
+    async def remove_parameter_from_workspace(
+        self,
+        *,
+        workspace: Workspace,
+        parameter: Parameter,
+        db_session: Optional[AsyncSession] = None
+    ) -> Workspace:
+        db_session = db_session or db.session
+        workspace.parameters.remove(parameter)
         db_session.add(workspace)
         await db_session.commit()
         await db_session.refresh(workspace)

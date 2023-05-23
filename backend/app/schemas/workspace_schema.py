@@ -2,11 +2,9 @@ from uuid import UUID
 from typing import List, Optional
 
 from app.models.workspace_model import WorkspaceBase
-from app.models.image_media_model import ImageMedia
 from app.schemas.image_media_schema import ImageMediaRead
 from app.schemas.comment_schema import CommentRead
 from app.schemas.parameter_schema import ParameterRead
-from app.schemas.response_schemas import PostResponseBase
 from app.schemas.status_schema import StatusRead
 
 
@@ -16,7 +14,8 @@ class WorkspaceCreate(WorkspaceBase):
     
 
 class WorkspaceUpdate(WorkspaceBase):
-    pass
+    images_id: Optional[List[UUID]] = []
+    parameters: Optional[List[str]] = []
 
 
 class WorkspaceRead(WorkspaceBase):
@@ -27,3 +26,8 @@ class WorkspaceRead(WorkspaceBase):
     id: UUID
     user_id: UUID
     status: Optional[StatusRead]
+
+
+class WorkspaceDelete(WorkspaceBase):
+    id: UUID
+    user_id: UUID

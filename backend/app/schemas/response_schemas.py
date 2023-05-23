@@ -97,8 +97,10 @@ def create_response(
         data.message = "Data paginated correctly" if not message else message
         data.meta = meta
         return data
-    body_response = {"data": data, "message": message, "meta": meta}
+    # body_response = {"data": data, "message": message, "meta": meta}
 
     # It returns a dictionary to avoid doble
     # validation https://github.com/tiangolo/fastapi/issues/3021
-    return {k: v for k, v in body_response.items() if v is not None}
+    # return {k: v for k, v in body_response.items() if v is not None}
+    # print('##############\n' + data + '##############\n' )
+    return {"data": data, "message": message, "meta": meta}

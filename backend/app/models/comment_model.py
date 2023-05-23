@@ -8,7 +8,7 @@ from app.models.base_model import BaseUUIDModel
 class CommentBase(SQLModel):
     text: str
     advantages: str
-    disadnatages: str
+    disadvantages: str
     rating: Optional[int] = Field(nullable=False)
     
 
