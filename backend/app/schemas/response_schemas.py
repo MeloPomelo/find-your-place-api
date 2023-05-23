@@ -26,7 +26,7 @@ class ResponseBase(GenericModel, Generic[T]):
 
 
 class PageBase(Page[T], Generic[T]):
-    message: str = ""
+    pages: int
     previous_page: Optional[int]
     next_page: Optional[int]
 

@@ -1,6 +1,7 @@
 import uvicorn 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 from fastapi_async_sqlalchemy import SQLAlchemyMiddleware
 from sqlmodel import text
 
@@ -51,6 +52,6 @@ async def on_startup():
     await add_postgresql_extension()
     print("startup fastapi")
 
-
+add_pagination(app)
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

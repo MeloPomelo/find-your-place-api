@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.exceptions import HTTPException
 from uuid import UUID
 from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params
-
+from typing import Optional
 from app.api.endpoints import deps
 from app.models.users_model import User
 from app.crud.parameter_crud import parameter
@@ -24,6 +24,7 @@ from app.schemas.response_schemas import (
 from app.schemas.parameter_schema import ParameterRead
 from app.schemas.role_schema import RoleEnum
 from app.schemas.workspace_schema import WorkspaceRead
+from app.schemas.status_schema import IStatusWorkspace
 
 
 router = APIRouter()
@@ -62,7 +63,9 @@ async def get_statuses_list(
 @router.put("/set_status")
 async def set_workspace_status(
     workspace_id: UUID,
-    code_name: str
+    code_name: Optional[IStatusWorkspace] = Query(
+        default=IStatusWorkspace.handling
+    )
 ) -> PutResponseBase[WorkspaceRead]:
     current_workspace = await workspace.get(id=workspace_id)
     new_status = await status.get_status_by_code_name(code_name=code_name, db_session=db.session)
