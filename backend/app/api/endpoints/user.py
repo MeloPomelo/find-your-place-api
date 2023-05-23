@@ -5,7 +5,10 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 from fastapi_pagination import Params
 from sqlmodel import SQLModel, select, func
+from datetime import timedelta
 
+from app.core import security
+from app.core.config import settings
 from app.crud import user_crud as crud
 from app.crud.workspace_crud import workspace
 from app.models.users_model import User
@@ -14,6 +17,7 @@ from app.schemas.response_schemas import PostResponseBase, GetResponseBase, crea
 from app.schemas.user_schema import UserCreate, UserRead
 from app.schemas.workspace_schema import WorkspaceRead
 from app.schemas.role_schema import RoleEnum
+from app.schemas.token_schema import TokenRead
 
 from app.api.endpoints import deps
 
@@ -25,12 +29,22 @@ router = APIRouter()
 async def registrate_user(
     # new_user: UserCreate = Depends(user_deps.user_exists),
     new_user: UserCreate,
-) -> PostResponseBase[UserRead]:
+) -> TokenRead:
     """
     Registration for new users
     """
     user = await crud.user.create_user(obj_in=new_user)
-    return create_response(data=user)
+    # return create_response(data=user)
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        user.id, expires_delta=access_token_expires
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 
 @router.get("")

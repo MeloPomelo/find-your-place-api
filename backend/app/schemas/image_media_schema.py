@@ -5,7 +5,7 @@ from typing import Optional
 
 
 class ImageMediaCreate(ImageMediaBase):
-    pass
+    media: Optional[MediaRead]
 
 
 class ImageMediaUpdate(ImageMediaBase):

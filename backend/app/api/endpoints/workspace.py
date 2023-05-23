@@ -32,6 +32,7 @@ from app.crud import (
 )
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
+from app.schemas.image_media_schema import ImageMediaCreate
 from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
@@ -50,6 +51,7 @@ from app.schemas.response_schemas import (
 
 from app.schemas.category_schema import CategoryRead
 from app.crud.category_crud import category
+
 
 router = APIRouter()
 
@@ -156,7 +158,7 @@ async def upload_image(
     image_file: UploadFile = File(...),
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin, RoleEnum.user])),
     minio_client: MinioClient = Depends(deps.minio_auth),
-) -> PostResponseBase[ImageMedia]:
+) -> PostResponseBase[ImageMediaCreate]:
     """
     Uploads a workspace image
     """
