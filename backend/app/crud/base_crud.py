@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params, Page
+from fastapi_pagination.bases import AbstractPage
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlmodel import SQLModel, select, func
@@ -63,7 +64,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         params: Optional[Params] = Params(),
         query: Optional[Union[T, Select[T]]] = None,
         db_session: Optional[AsyncSession] = None,
-    ) -> Page[ModelType]:
+    ) -> AbstractPage[ModelType]:
         db_session = db_session or db.session
         if query is None:
             query = select(self.model)  

@@ -2,8 +2,10 @@ from io import BytesIO
 from typing import List, Union
 from uuid import UUID
 from sqlmodel import select, and_
-from fastapi_pagination import Params
+from fastapi_pagination import Params, Page
+from fastapi_pagination.bases import AbstractPage
 from fastapi_async_sqlalchemy import db
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi import (
     APIRouter, 
     Depends, 
@@ -35,6 +37,8 @@ from app.schemas.workspace_schema import (
     WorkspaceUpdate,
     WorkspaceDelete,
 )
+from app.schemas.parameter_schema import ParameterRead
+from app.schemas.status_schema import StatusRead
 from app.schemas.response_schemas import (
     GetResponseBase,
     GetResponsePaginated,
@@ -64,10 +68,9 @@ async def get_by_parameters(
         if query_items[key]:
             a += [Workspace.parameters.property.mapper.c.code_name == i for i in query_items[key]]
     if a:
-        query = select(Workspace).join(Workspace.parameters).where(and_(*a))
+        query = select(Workspace).join(Workspace.parameters).where(and_(*a)).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
     else:
-        query = select(Workspace)
-    
+        query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
