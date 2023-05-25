@@ -6,8 +6,10 @@ from uuid import UUID
 from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params
 from typing import Optional
+from sqlmodel import select
 from app.api.endpoints import deps
 from app.models.users_model import User
+from app.models.workspace_model import Workspace
 from app.crud.parameter_crud import parameter
 from app.crud.category_crud import category
 from app.crud.status_crud import status
@@ -64,7 +66,7 @@ async def get_statuses_list(
 async def set_workspace_status(
     workspace_id: UUID,
     code_name: Optional[IStatusWorkspace] = Query(
-        default=IStatusWorkspace.handling
+        default=IStatusWorkspace.approved
     ),
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> PutResponseBase[WorkspaceRead]:
@@ -80,9 +82,13 @@ async def set_workspace_status(
 async def get_workspace_list(
     params: Params = Depends(),
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
+    status: Optional[IStatusWorkspace] = Query(default=None)
 ) -> GetResponsePaginated[WorkspaceRead]:
     """
     Gets a paginated list of workspaces
     """
-    workspaces = await workspace.get_multi_paginated(params=params)
+    query = select(Workspace)
+    if status:
+        query = query.join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == status)
+    workspaces = await workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)

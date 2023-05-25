@@ -96,7 +96,21 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     {
         "data": ParameterCreate(
             name="Конференц-зал",
-            code_name="conference room"
+            code_name="conference_room"
+        ),
+        "category": "Комнаты"
+    },
+    {
+        "data": ParameterCreate(
+            name="душевая комната",
+            code_name="shower_room"
+        ),
+        "category": "Комнаты"
+    },
+    {
+        "data": ParameterCreate(
+            name="комната переговоров",
+            code_name="meeting_room"
         ),
         "category": "Комнаты"
     },
@@ -104,6 +118,27 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
         "data": ParameterCreate(
             name="Чай/Кофе",
             code_name="service"
+        ),
+        "category": "Дополнительно"
+    },
+    {
+        "data": ParameterCreate(
+            name="Круглосуточно",
+            code_name="24/7"
+        ),
+        "category": "Дополнительно"
+    },
+    {
+        "data": ParameterCreate(
+            name="аренда гаджетов",
+            code_name="gadget_rental"
+        ),
+        "category": "Дополнительно"
+    },
+    {
+        "data": ParameterCreate(
+            name="почасовая оплата",
+            code_name="hourly_payment"
         ),
         "category": "Дополнительно"
     }

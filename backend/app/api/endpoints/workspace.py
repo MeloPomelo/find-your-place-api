@@ -38,7 +38,12 @@ from app.schemas.workspace_schema import (
     WorkspaceRead,
     WorkspaceUpdate,
 )
-from app.schemas.parameter_schema import ParameterRead
+from app.schemas.parameter_schema import (
+    ParameterRead,
+    IParametersRooms,
+    IParametersFeatures,
+    IParametersAdditional
+)
 from app.schemas.status_schema import StatusRead
 from app.schemas.response_schemas import (
     GetResponseBase,
@@ -71,10 +76,11 @@ async def get_by_parameters(
     for key in query_items.keys():
         if query_items[key]:
             a += [Workspace.parameters.property.mapper.c.code_name == i for i in query_items[key]]
+    
+    query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
     if a:
-        query = select(Workspace).join(Workspace.parameters).where(and_(*a)).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
-    else:
-        query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
+        query = query.join(Workspace.parameters).where(and_(*a))
+ 
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
