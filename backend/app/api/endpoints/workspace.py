@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Optional, List, Union
+from typing import List, Union
 from uuid import UUID
 from sqlmodel import select, and_
 from fastapi_pagination import Params, Page
@@ -11,24 +11,22 @@ from fastapi import (
     Depends, 
     Query, 
     HTTPException, 
-    Body, 
     UploadFile, 
     File,
     Response
 )
+
 from app.api.endpoints import deps
 from app.utils.resize_image import modify_image
 from app.utils.minio_client import MinioClient
-from app.models.users_model import User
-from app.models.workspace_model import Workspace
-from app.models.image_media_model import ImageMedia
-from app.models.comment_model import Comment
-from app.models.parameter_model import Parameter
+from app.models import User, Workspace
+
 from app.crud import (
     workspace_crud,
     image_media_crud,
     parameter_crud,
-    status_crud
+    status_crud,
+    comment_crud
 )
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
@@ -37,6 +35,7 @@ from app.schemas.workspace_schema import (
     WorkspaceCreate,
     WorkspaceRead,
     WorkspaceUpdate,
+    WorkspaceDelete,
 )
 from app.schemas.parameter_schema import (
     ParameterRead,
@@ -53,9 +52,6 @@ from app.schemas.response_schemas import (
     DeleteResponseBase,
     create_response,
 )
-
-from app.schemas.category_schema import CategoryRead
-from app.crud.category_crud import category
 
 
 router = APIRouter()
@@ -119,11 +115,11 @@ async def create_workspace(
             raise HTTPException(status_code=404, detail="Image not found")
         new_workspace = await workspace_crud.workspace.add_image_to_workspace(workspace=new_workspace, image_id=image_id)
 
-    for paramter_name in workspace.parameters:
-        paramter = await parameter_crud.parameter.get_parameter_by_name(name=paramter_name, db_session=db.session)
+    for paramter_code_name in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=paramter_code_name, db_session=db.session)
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
-        new_workspace = await workspace_crud.workspace.add_parameters_to_workspace(workspace=new_workspace, parameter=paramter)
+        new_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=new_workspace, parameter=paramter)
 
     return create_response(data=new_workspace) 
 
@@ -133,13 +129,42 @@ async def update_workspace(
     workspace_id: UUID,
     workspace: WorkspaceUpdate,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
-) -> PutResponseBase[WorkspaceUpdate]:
+) -> PutResponseBase[WorkspaceRead]:
     """
     Upadate a workspace
     """
     current_workspace = await workspace_crud.workspace.get(id=workspace_id)
     if not current_workspace:
         raise HTTPException(status_code=404, detail="Worksapce not found")
+    
+    merge_images = workspace.images_id[:]
+    merge_parameters = workspace.parameters[:]
+
+    for image in current_workspace.images:
+        if not image.id in workspace.images_id:
+            await workspace_crud.workspace.remove_image_from_workspace(workspace=current_workspace, image_id= image.id)
+        else:
+            merge_images.remove(image.id)
+
+    for parameter in current_workspace.parameters:
+        if not parameter.code_name in workspace.parameters:
+            parameter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=parameter.code_name, db_session=db.session)
+            await workspace_crud.workspace.remove_parameter_from_workspace(workspace=current_workspace, parameter=parameter)
+        else:
+            merge_parameters.remove(parameter.code_name)
+
+    for image_id in merge_images:
+        image = await image_media_crud.image_media.get(id=image_id)
+        if not image: 
+            raise HTTPException(status_code=404, detail="Image not found")
+        current_workspace = await workspace_crud.workspace.add_image_to_workspace(workspace=current_workspace, image_id=image_id)
+
+    for paramter_code_name in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=paramter_code_name, db_session=db.session)
+        if not paramter:
+            raise HTTPException(status_code=404, detail="Parameter not found")
+        current_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=current_workspace, parameter=paramter)
+
     workspace_updated = await workspace_crud.workspace.update(obj_new=workspace, obj_current=current_workspace)
     return create_response(data=workspace_updated)
 
@@ -148,13 +173,20 @@ async def update_workspace(
 async def delete_workspace(
     workspace_id: UUID,
     current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
-) -> DeleteResponseBase[WorkspaceRead]:
+) -> DeleteResponseBase[WorkspaceDelete]:
     """
     Delete a workspace
     """
     current_workspace = await workspace_crud.workspace.get(id=workspace_id)
     if not current_workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
+    
+    for comment in current_workspace.comments:
+        await comment_crud.comment.remove(id=comment.id)
+
+    for image in current_workspace.images:
+        await image_media_crud.image_media.remove(id=image.id)
+
     workspace = await workspace_crud.workspace.remove(id=workspace_id)
     return create_response(workspace)
 

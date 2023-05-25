@@ -5,7 +5,6 @@ from pydantic import EmailStr
 from uuid import UUID
 
 from app.models.base_model import BaseUUIDModel
-from .dictionary_model import Dictionary
 
 
 class WorkspaceBase(SQLModel):
