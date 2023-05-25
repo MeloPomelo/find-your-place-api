@@ -109,8 +109,8 @@ async def create_workspace(
             raise HTTPException(status_code=404, detail="Image not found")
         new_workspace = await workspace_crud.workspace.add_image_to_workspace(workspace=new_workspace, image_id=image_id)
 
-    for paramter_name in workspace.parameters:
-        paramter = await parameter_crud.parameter.get_parameter_by_name(name=paramter_name, db_session=db.session)
+    for paramter_code_name in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=paramter_code_name, db_session=db.session)
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
         new_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=new_workspace, parameter=paramter)
@@ -141,11 +141,11 @@ async def update_workspace(
             merge_images.remove(image.id)
 
     for parameter in current_workspace.parameters:
-        if not parameter.name in workspace.parameters:
-            parameter = await parameter_crud.parameter.get_parameter_by_name(name=parameter.name, db_session=db.session)
+        if not parameter.code_name in workspace.parameters:
+            parameter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=parameter.code_name, db_session=db.session)
             await workspace_crud.workspace.remove_parameter_from_workspace(workspace=current_workspace, parameter=parameter)
         else:
-            merge_parameters.remove(parameter.name)
+            merge_parameters.remove(parameter.code_name)
 
     for image_id in merge_images:
         image = await image_media_crud.image_media.get(id=image_id)
@@ -153,8 +153,8 @@ async def update_workspace(
             raise HTTPException(status_code=404, detail="Image not found")
         current_workspace = await workspace_crud.workspace.add_image_to_workspace(workspace=current_workspace, image_id=image_id)
 
-    for paramter_name in merge_parameters:
-        paramter = await parameter_crud.parameter.get_parameter_by_name(name=paramter_name, db_session=db.session)
+    for paramter_code_name in workspace.parameters:
+        paramter = await parameter_crud.parameter.get_parameter_by_code_name(code_name=paramter_code_name, db_session=db.session)
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
         current_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=current_workspace, parameter=paramter)
