@@ -36,7 +36,6 @@ router = APIRouter()
 async def get_parameters_list(
     skip: int = 0, 
     limit: int = 100,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> StreamingResponse:
     parameters = await parameter.get_multi(skip=skip, limit=limit)
     return parameters
@@ -46,7 +45,6 @@ async def get_parameters_list(
 async def get_categories_list(
     skip: int = 0, 
     limit: int = 100,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> StreamingResponse:
     categories = await category.get_multi(skip=skip, limit=limit)
     return categories
