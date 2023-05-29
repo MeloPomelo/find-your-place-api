@@ -82,56 +82,69 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     {
         "data": ParameterCreate(
             name="Печать материалов",
-            code_name="printer"
+            code_name="print"
         ),
         "category": "Технические особенности",
     },
     {
         "data": ParameterCreate(
             name="Wi-Fi",
-            code_name="wi-fi"
+            code_name="wifi"
         ),
         "category": "Технические особенности"
     },
     {
         "data": ParameterCreate(
-            name="Конференц-зал",
-            code_name="conference_room"
+            name="Конференц зал",
+            code_name="podium"
         ),
         "category": "Комнаты"
     },
     {
         "data": ParameterCreate(
             name="душевая комната",
-            code_name="shower_room"
+            code_name="shower"
         ),
         "category": "Комнаты"
     },
     {
         "data": ParameterCreate(
-            name="комната переговоров",
+            name="Комната переговоров",
             code_name="meeting_room"
         ),
         "category": "Комнаты"
     },
     {
         "data": ParameterCreate(
-            name="Чай/Кофе",
-            code_name="service"
+            name="Комната для курения",
+            code_name="smoking_rooms"
+        )
+    },
+    {
+        "data": ParameterCreate(
+            name="Чай, Кофе",
+            code_name="local_cafe"
         ),
         "category": "Дополнительно"
     },
     {
         "data": ParameterCreate(
             name="Круглосуточно",
-            code_name="24/7"
+            code_name="24mp"
         ),
         "category": "Дополнительно"
     },
     {
         "data": ParameterCreate(
-            name="аренда гаджетов",
-            code_name="gadget_rental"
+            name="Метро",
+            code_name="subway"
+        ),
+        "category": "Дополнительно"
+    },
+    {
+        "data": ParameterCreate(
+            name="Аренда гаджетов",
+            code_name="keyboard"
         ),
         "category": "Дополнительно"
     },
