@@ -15,37 +15,8 @@ services:
     env_file: ".env"
     depends_on:
       - database
-    links:
-      - traefik-proxy:storage.localhost
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi_local.entrypoints=web"
-      - "traefik.http.routers.fastapi_local.rule=Host(`fastapi.${LOCAL_1}`, `fastapi.${LOCAL_2}`)"
-      - "traefik.http.routers.fastapi_local_base.entrypoints=web"
-      - "traefik.http.routers.fastapi_local_base.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`)"
-      - "traefik.http.services.fastapi_localservice.loadbalancer.server.port=8000"
 
-  traefik-proxy:
-    container_name: traefik-proxy
-    restart: always
-    image: "traefik:latest"
-    command:
-      - "--providers.docker=true"
-    ports:
-      - "80:80"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - ./traefik/traefik.yaml:/traefik.yaml:ro
-      - ./traefik/.htpasswd:/.htpasswd
-      - "${EB_LOG_BASE_DIR:-./traefik}/logs:/logs"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
-    env_file: ".env"
-  
+
   database:
     image: postgres:latest
     container_name: database
@@ -74,6 +45,7 @@ services:
     depends_on:
       - database
 
+
   minio_server:
     image: minio/minio:latest
     container_name: minio_server
@@ -87,13 +59,4 @@ services:
     environment:
         MINIO_ROOT_USER: ${MINIO_ROOT_USER}
         MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.minio.entrypoints=web
-      - traefik.http.routers.minio.service=minio
-      - traefik.http.routers.minio.rule=Host(`storage.${LOCAL_1}`, `storage.${LOCAL_2}`)      
-      - traefik.http.services.minio.loadbalancer.server.port=9000
-      - traefik.http.routers.minio-console.entrypoints=web
-      - traefik.http.routers.minio-console.service=minio-console
-      - traefik.http.routers.minio-console.rule=Host(`stash.${LOCAL_1}`, `stash.${LOCAL_2}`)      
-      - traefik.http.services.minio-console.loadbalancer.server.port=9090
+

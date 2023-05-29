@@ -119,7 +119,8 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
         "data": ParameterCreate(
             name="Комната для курения",
             code_name="smoking_rooms"
-        )
+        ),
+        "category": "Комнаты"
     },
     {
         "data": ParameterCreate(
