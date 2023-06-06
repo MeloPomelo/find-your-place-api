@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import StreamingResponse
 from fastapi.exceptions import HTTPException
 from uuid import UUID
 from fastapi_async_sqlalchemy import db

@@ -18,7 +18,6 @@ from app.api.endpoints import deps
 from app.utils.resize_image import modify_image
 from app.utils.minio_client import MinioClient
 from app.models import User, Workspace
-
 from app.crud import (
     workspace_crud,
     image_media_crud,
@@ -35,13 +34,6 @@ from app.schemas.workspace_schema import (
     WorkspaceUpdate,
     WorkspaceDelete,
 )
-from app.schemas.parameter_schema import (
-    ParameterRead,
-    IParametersRooms,
-    IParametersFeatures,
-    IParametersAdditional
-)
-from app.schemas.status_schema import StatusRead
 from app.schemas.response_schemas import (
     GetResponseBase,
     GetResponsePaginated,
@@ -57,6 +49,7 @@ router = APIRouter()
 
 @router.get("")
 async def get_by_parameters(
+    search: Union[str, None] = None,
     rooms: Union[List[str], None] = Query(default=None),
     additional: Union[List[str], None] = Query(default=None),
     features: Union[List[str], None] = Query(default=None),
@@ -74,7 +67,8 @@ async def get_by_parameters(
     query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
     if a:
         query = query.join(Workspace.parameters).where(and_(*a))
- 
+    if search:
+        query = query.filter(Workspace.title.startswith(search))
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 

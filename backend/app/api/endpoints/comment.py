@@ -1,34 +1,22 @@
-from io import BytesIO
-from typing import Optional, List
 from uuid import UUID
-from fastapi_pagination import Params
 from fastapi import (
     APIRouter, 
     Depends, 
-    Query, 
     HTTPException, 
-    Body, 
-    UploadFile, 
-    File,
-    Response
 )
+
 from app.api.endpoints import deps
 from app.models.users_model import User
 from app.crud import comment_crud as crud
 from app.crud.workspace_crud import workspace
 from app.schemas.role_schema import RoleEnum
+from app.schemas.comment_schema import CommentCreate, CommentUpdate, CommentRead
 from app.schemas.response_schemas import (
     GetResponseBase,
-    GetResponsePaginated,
     PostResponseBase, 
     PutResponseBase, 
     DeleteResponseBase,
     create_response,
-)
-from app.schemas.comment_schema import (
-    CommentCreate,
-    CommentUpdate,
-    CommentRead,
 )
 
 

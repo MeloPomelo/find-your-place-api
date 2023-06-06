@@ -48,8 +48,13 @@ class Workspace(BaseUUIDModel, WorkspaceBase, table=True):
         back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
+    visits: List["Visit"] = Relationship(
+       back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
     parameters: List["Parameter"] = Relationship(
         back_populates="workspaces", link_model=WorkspaceParameterLink, sa_relationship_kwargs={"lazy": "selectin"}
     ) 
 
+    
 
