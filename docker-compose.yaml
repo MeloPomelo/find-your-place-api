@@ -1,5 +1,6 @@
 version: '3.8'
 
+
 services:
   fastapi_server:
     container_name: fastapi_server
@@ -15,6 +16,10 @@ services:
     env_file: ".env"
     depends_on:
       - database
+    labels:
+      - 'traefik.http.routers.fastapi_server.rule=Host(`${EXT_ENDPOINT1}`)'
+      - 'traefik.http.routers.fastapi_server.tls=true'
+      - "traefik.http.routers.fastapi_server.entrypoints=web-secure"
 
 
   database:
@@ -32,6 +37,24 @@ services:
       - POSTGRES_DATABASE=${POSTGRES_SERVER}
       - POSTGRES_HOST_AUTH_METHOD= "trust"
       - POSTGRESQL_POSTGRES_PASSWORD= ${POSTGRES_PASSWORD}
+
+
+  traefik:
+    image: traefik:latest
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web-secure.address=:443
+      - --providers.docker=true
+      - --providers.file.directory=/config/
+      - --providers.file.watch=true
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - '/var/traefik/config/:/config/'
+    env_file: ".env"
+
 
   pgadmin:
     container_name: pgadmin
@@ -60,3 +83,7 @@ services:
         MINIO_ROOT_USER: ${MINIO_ROOT_USER}
         MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
 
+
+networks:
+  traefik:
+    external: true
