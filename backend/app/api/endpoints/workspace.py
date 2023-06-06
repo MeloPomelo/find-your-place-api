@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import List, Union
+from typing import List, Union, Optional
 from uuid import UUID
 from sqlmodel import select, and_
 from fastapi_pagination import Params
@@ -57,6 +57,7 @@ router = APIRouter()
 
 @router.get("")
 async def get_by_parameters(
+    search: Union[str, None] = None,
     rooms: Union[List[str], None] = Query(default=None),
     additional: Union[List[str], None] = Query(default=None),
     features: Union[List[str], None] = Query(default=None),
@@ -74,7 +75,8 @@ async def get_by_parameters(
     query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
     if a:
         query = query.join(Workspace.parameters).where(and_(*a))
- 
+    if search:
+        query = query.filter(Workspace.title.startswith(search))
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
