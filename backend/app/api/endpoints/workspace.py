@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import List, Union
+from typing import List, Union, Optional
 from uuid import UUID
 from sqlmodel import select, and_
 from fastapi_pagination import Params
