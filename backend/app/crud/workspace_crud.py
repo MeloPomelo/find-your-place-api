@@ -5,7 +5,7 @@ from fastapi_async_sqlalchemy import db
 from sqlmodel import select, func, and_
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.models import Workspace, Parameter, Status
+from app.models import Workspace, Parameter, Status, Tariff
 from app.schemas.workspace_schema import WorkspaceCreate, WorkspaceUpdate
 from app.schemas.comment_schema import CommentCreate
 from app.crud.base_crud import CRUDBase
@@ -76,6 +76,20 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         await db_session.refresh(workspace)
         return workspace
 
+    
+    async def add_tariff_to_workspace(
+        self,
+        *,
+        workspace: Workspace,
+        tariff: Tariff,
+        db_session: Optional[AsyncSession] = None
+    ) -> Workspace:
+        db_session = db_session or db.session
+        workspace.tariffs.append(tariff)
+        db_session.add(workspace)
+        await db_session.commit()
+        await db_session.refresh(workspace)
+        return workspace
 
     async def set_status(
         self,

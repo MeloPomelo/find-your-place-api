@@ -23,7 +23,8 @@ from app.crud import (
     image_media_crud,
     parameter_crud,
     status_crud,
-    comment_crud
+    comment_crud,
+    tariff_crud,
 )
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
@@ -112,6 +113,10 @@ async def create_workspace(
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
         new_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=new_workspace, parameter=paramter)
+
+    for tariff in workspace.tariffs:
+        tariff = await tariff_crud.tariff.create(obj_in=tariff)
+        new_workspace = await workspace_crud.workspace.add_tariff_to_workspace(workspace=new_workspace, tariff=tariff)
 
     return create_response(data=new_workspace) 
 

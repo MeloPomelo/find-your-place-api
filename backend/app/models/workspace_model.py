@@ -40,7 +40,7 @@ class Workspace(BaseUUIDModel, WorkspaceBase, table=True):
     )
     user_id: Optional[UUID] = Field(default=None, foreign_key="User.id")
 
-    images: List["ImageMedia"] = Relationship(  # noqa: F821
+    images: List["ImageMedia"] = Relationship( 
         back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
@@ -49,12 +49,17 @@ class Workspace(BaseUUIDModel, WorkspaceBase, table=True):
     )
 
     visits: List["Visit"] = Relationship(
-       back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
+        back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+    tariffs: List["Tariff"] = Relationship(
+        back_populates="workspace", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
     parameters: List["Parameter"] = Relationship(
         back_populates="workspaces", link_model=WorkspaceParameterLink, sa_relationship_kwargs={"lazy": "selectin"}
     ) 
+
 
     
 

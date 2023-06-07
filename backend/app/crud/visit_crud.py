@@ -3,8 +3,8 @@ from app.models import Visit
 from app.schemas.visit_schema import VisitCreate, VisitUpdate
 
 
-class CRUDComment(CRUDBase[Visit, VisitCreate, VisitUpdate]):
+class CRUDVisit(CRUDBase[Visit, VisitCreate, VisitUpdate]):
     pass
 
 
-visit = CRUDComment(Visit)
+visit = CRUDVisit(Visit)
