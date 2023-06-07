@@ -12,7 +12,7 @@ from app.models.users_model import User
 from app.models.workspace_model import Workspace
 from app.models import Visit
 from app.schemas.response_schemas import GetResponseBase, create_response, GetResponsePaginated
-from app.schemas.user_schema import UserCreate, UserRead
+from app.schemas.user_schema import UserCreate, UserRead, UserUpdate
 from app.schemas.workspace_schema import WorkspaceRead
 from app.schemas.visit_schema import VisitRead
 from app.schemas.role_schema import RoleEnum
@@ -52,6 +52,15 @@ async def get_my_data(
     Gets my user profile information
     """
     return create_response(data=current_user)
+
+@router.patch("")
+async def update_user(
+    new_user: UserUpdate,
+    current_user: User = Depends(deps.get_current_user()),
+) -> GetResponseBase[UserRead]:
+    user_updated = await crud.user.update(obj_new=new_user, obj_current=current_user)
+    return create_response(data=user_updated)
+
 
 @router.get("/workspaces")
 async def get_user_workspaces(

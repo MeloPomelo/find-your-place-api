@@ -25,9 +25,11 @@ class UserCreateWithRole(UserBase):
     class Config:
         hashed_password = None
 
-class UserUpdate(UserBase):
-    pass
-
+class UserUpdate(BaseModel):
+    first_name: str
+    last_name: str
+    email: Optional[str]
+    phone: Optional[str]
 
 class UserRead(UserBase):
     id: UUID
