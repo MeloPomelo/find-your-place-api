@@ -132,6 +132,7 @@ dmypy.json
 db_docker
 
 /traefik/logs
+/traefik/certificates
 
 minio
 
