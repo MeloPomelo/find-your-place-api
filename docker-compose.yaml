@@ -1,5 +1,6 @@
 version: '3.8'
 
+
 services:
   fastapi_server:
     container_name: fastapi_server
@@ -15,37 +16,12 @@ services:
     env_file: ".env"
     depends_on:
       - database
-    links:
-      - traefik-proxy:storage.localhost
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi_local.entrypoints=web"
-      - "traefik.http.routers.fastapi_local.rule=Host(`fastapi.${LOCAL_1}`, `fastapi.${LOCAL_2}`)"
-      - "traefik.http.routers.fastapi_local_base.entrypoints=web"
-      - "traefik.http.routers.fastapi_local_base.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`)"
-      - "traefik.http.services.fastapi_localservice.loadbalancer.server.port=8000"
+      - 'traefik.http.routers.fastapi_server.rule=Host(`${EXT_ENDPOINT1}`)'
+      - 'traefik.http.routers.fastapi_server.tls=true'
+      - "traefik.http.routers.fastapi_server.entrypoints=web-secure"
 
-  traefik-proxy:
-    container_name: traefik-proxy
-    restart: always
-    image: "traefik:latest"
-    command:
-      - "--providers.docker=true"
-    ports:
-      - "80:80"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - ./traefik/traefik.yaml:/traefik.yaml:ro
-      - ./traefik/.htpasswd:/.htpasswd
-      - "${EB_LOG_BASE_DIR:-./traefik}/logs:/logs"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
-    env_file: ".env"
-  
+
   database:
     image: postgres:latest
     container_name: database
@@ -62,6 +38,24 @@ services:
       - POSTGRES_HOST_AUTH_METHOD= "trust"
       - POSTGRESQL_POSTGRES_PASSWORD= ${POSTGRES_PASSWORD}
 
+
+  traefik:
+    image: traefik:latest
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web-secure.address=:443
+      - --providers.docker=true
+      - --providers.file.directory=/config/
+      - --providers.file.watch=true
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - '/var/traefik/config/:/config/'
+    env_file: ".env"
+
+
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -73,6 +67,7 @@ services:
       - "5050:80"
     depends_on:
       - database
+
 
   minio_server:
     image: minio/minio:latest
@@ -87,13 +82,8 @@ services:
     environment:
         MINIO_ROOT_USER: ${MINIO_ROOT_USER}
         MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.minio.entrypoints=web
-      - traefik.http.routers.minio.service=minio
-      - traefik.http.routers.minio.rule=Host(`storage.${LOCAL_1}`, `storage.${LOCAL_2}`)      
-      - traefik.http.services.minio.loadbalancer.server.port=9000
-      - traefik.http.routers.minio-console.entrypoints=web
-      - traefik.http.routers.minio-console.service=minio-console
-      - traefik.http.routers.minio-console.rule=Host(`stash.${LOCAL_1}`, `stash.${LOCAL_2}`)      
-      - traefik.http.services.minio-console.loadbalancer.server.port=9090
+
+
+networks:
+  traefik:
+    external: true

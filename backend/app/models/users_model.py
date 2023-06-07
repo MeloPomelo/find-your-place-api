@@ -1,7 +1,6 @@
 from datetime import datetime
 from sqlmodel import Field, SQLModel, DateTime, Column, Relationship
 from typing import Optional, List
-from pydantic import EmailStr
 from uuid import UUID
 
 from app.models.base_model import BaseUUIDModel
@@ -10,6 +9,10 @@ from app.models.base_model import BaseUUIDModel
 class UserBase(SQLModel):
     first_name: str
     last_name: str
+    email: Optional[str] = Field(
+        nullable=True, index=True, sa_column_kwargs={"unique": True}
+    )
+    phone: Optional[str]
     username: str = Field(
         nullable=True, index=True, sa_column_kwargs={"unique": True}
     )
@@ -31,6 +34,10 @@ class User(BaseUUIDModel, UserBase, table=True):
     )
 
     comments: List["Comment"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+    visits: List["Visit"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
     )
 

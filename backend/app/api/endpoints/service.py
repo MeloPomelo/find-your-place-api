@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import StreamingResponse
 from fastapi.exceptions import HTTPException
 from uuid import UUID
 from fastapi_async_sqlalchemy import db
@@ -36,7 +35,6 @@ router = APIRouter()
 async def get_parameters_list(
     skip: int = 0, 
     limit: int = 100,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> StreamingResponse:
     parameters = await parameter.get_multi(skip=skip, limit=limit)
     return parameters
@@ -46,7 +44,6 @@ async def get_parameters_list(
 async def get_categories_list(
     skip: int = 0, 
     limit: int = 100,
-    current_user: User = Depends(deps.get_current_user(required_roles=[RoleEnum.admin])),
 ) -> StreamingResponse:
     categories = await category.get_multi(skip=skip, limit=limit)
     return categories
