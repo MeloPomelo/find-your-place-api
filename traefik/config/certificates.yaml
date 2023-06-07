@@ -1,4 +1,13 @@
 tls:
+  stores:
+    default:
+      defaultCertificate:
+        - certFile: /certificates/findyourplaceapi.crt
+        keyFile: /certificates/private.key
+        
   certificates:
     - certFile: /certificates/findyourplaceapi.crt
       keyFile: /certificates/private.key
+      stores:
+        - default
+  

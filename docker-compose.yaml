@@ -17,9 +17,10 @@ services:
     depends_on:
       - database
     labels:
-      - 'traefik.http.routers.fastapi_server.rule=Host(`${EXT_ENDPOINT1}`)'
-      - 'traefik.http.routers.fastapi_server.tls=true'
-      - "traefik.http.routers.fastapi_server.entrypoints=web-secure"
+      - "traefik.enable=true"
+      - 'traefik.http.routers.fastapi_server.rule=Host(`${EXT_ENDPOINT1}`, `${LOCAL_1}`)'
+      - 'traefik.http.routers.fastapi_server.tls.certresolver=myresolver'
+      - "traefik.http.routers.fastapi_server.entrypoints=websecure"
 
 
   database:
@@ -42,17 +43,20 @@ services:
   traefik:
     image: traefik:latest
     command:
-      - --entrypoints.web.address=:80
-      - --entrypoints.web-secure.address=:443
-      - --providers.docker=true
-      - --providers.file.directory=/config/
-      - --providers.file.watch=true
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=nikiforov.kira@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/traefik/acme.json"
     ports:
-      - '80:80'
       - '443:443'
+      - '8080:8080'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
-      - '/var/traefik/config/:/config/'
+      - "./traefik:/traefik"
     env_file: ".env"
 
 
