@@ -1,7 +1,8 @@
 from io import BytesIO
 from typing import List, Union, Optional
 from uuid import UUID
-from sqlmodel import select, and_
+from sqlmodel import select, and_, or_, func
+from sqlalchemy.orm import selectinload
 from fastapi_pagination import Params
 from fastapi_async_sqlalchemy import db
 from fastapi import (
@@ -17,13 +18,14 @@ from fastapi import (
 from app.api.endpoints import deps
 from app.utils.resize_image import modify_image
 from app.utils.minio_client import MinioClient
-from app.models import User, Workspace
+from app.models import User, Workspace, Status
 from app.crud import (
     workspace_crud,
     image_media_crud,
     parameter_crud,
     status_crud,
-    comment_crud
+    comment_crud,
+    tariff_crud,
 )
 from app.schemas.role_schema import RoleEnum
 from app.schemas.media_schema import MediaCreate
@@ -55,20 +57,30 @@ async def get_by_parameters(
     features: Union[List[str], None] = Query(default=None),
     params: Params = Depends(),
 ) -> GetResponsePaginated[WorkspaceRead]:
-    query_items = {}
-    query_items['rooms'] = rooms
-    query_items['additional'] = additional
-    query_items['features'] = features
     a = []
-    for key in query_items.keys():
-        if query_items[key]:
-            a += [Workspace.parameters.property.mapper.c.code_name == i for i in query_items[key]]
-    
-    query = select(Workspace).join(Workspace.status).where(Workspace.status.property.mapper.c.code_name == "approved")
+    if rooms:
+        a += rooms
+    if additional:
+        a += additional
+    if features:
+        a += features
+
+    query = select(Workspace).\
+        join(Workspace.status).\
+        where(Workspace.status.property.mapper.c.code_name == "approved")
+
     if a:
-        query = query.join(Workspace.parameters).where(and_(*a))
+        query = query.\
+            join(Workspace.parameters).\
+            where(Workspace.parameters.property.mapper.c.code_name.in_(a)).\
+            group_by(Workspace.id).\
+            having(func.count(Workspace.parameters.property.mapper.c.code_name) >= len(a))
+
     if search:
-        query = query.filter(Workspace.title.startswith(search))
+        query = query.filter(func.lower(Workspace.title).contains(search.lower()))
+
+    query = query.options(selectinload(Workspace.parameters), selectinload(Workspace.status), selectinload(Workspace.user))
+
     workspaces = await workspace_crud.workspace.get_multi_paginated(params=params, query=query)
     return create_response(data=workspaces)
 
@@ -112,6 +124,10 @@ async def create_workspace(
         if not paramter:
             raise HTTPException(status_code=404, detail="Parameter not found")
         new_workspace = await workspace_crud.workspace.add_parameter_to_workspace(workspace=new_workspace, parameter=paramter)
+
+    for tariff in workspace.tariffs:
+        tariff = await tariff_crud.tariff.create(obj_in=tariff)
+        new_workspace = await workspace_crud.workspace.add_tariff_to_workspace(workspace=new_workspace, tariff=tariff)
 
     return create_response(data=new_workspace) 
 
