@@ -16,6 +16,8 @@ services:
     env_file: ".env"
     depends_on:
       - database
+    links:
+      - caddy_reverse_proxy:storage.localhost
 
 
   database:
@@ -50,14 +52,37 @@ services:
 
   minio_server:
     image: minio/minio:latest
-    container_name: minio_server
-    command: server --console-address ":9001" /data/
     restart: always
+    container_name: minio_server
     volumes:
       - ./minio/data:/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    expose:
+      - 9000
+      - 9091
     environment:
-        MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-        MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BROWSER_REDIRECT_URL: http://stash.localhost
+    command: "server /data --console-address ':9090'"  
+
+
+  caddy_reverse_proxy:
+      container_name: caddy_reverse_proxy
+      image: caddy:alpine
+      restart: always
+      ports:
+        - 80:80      
+        - 443:443
+      environment:
+        - EXT_ENDPOINT1=${EXT_ENDPOINT1}
+        - LOCAL_1=${LOCAL_1}
+        - LOCAL_2=${LOCAL_2}
+      volumes:
+        - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+        - caddy_data:/data
+        - caddy_config:/config
+
+
+volumes:
+  caddy_data:
+  caddy_config:
