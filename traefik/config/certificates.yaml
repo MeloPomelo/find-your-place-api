@@ -1,4 +1,0 @@
-tls:
-  certificates:
-    - certFile: /certificates/findyourplaceapi.crt
-      keyFile: /certificates/private.key
