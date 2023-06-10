@@ -86,4 +86,19 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return user
     
 
+    async def add_bonuses(
+        self,
+        *,
+        amount: int,
+        user_id: int,
+        db_session: Optional[AsyncSession] = None
+    ) -> Optional[User]:
+        db_session = db_session or db.session
+        user = await self.get(id=user_id, db_session=db_session)
+        user.bonus_balance += amount
+        await db_session.commit()
+        await db_session.refresh(user)
+        return user
+    
+
 user = CRUDUser(User)

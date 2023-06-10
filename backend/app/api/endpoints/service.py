@@ -13,6 +13,7 @@ from app.crud.parameter_crud import parameter
 from app.crud.category_crud import category
 from app.crud.status_crud import status
 from app.crud.workspace_crud import workspace
+from app.crud.user_crud import user
 
 from app.schemas.response_schemas import (
     GetResponseBase,
@@ -72,6 +73,7 @@ async def set_workspace_status(
     if not new_status:
         raise HTTPException(status_code=404, detail="Status not found")
     current_workspace = await workspace.set_status(workspace=current_workspace, status=new_status)
+    await user.add_bonuses(user_id=current_workspace.user_id, amount=50)
     return create_response(data=current_workspace)
 
 

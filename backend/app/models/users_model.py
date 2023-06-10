@@ -19,6 +19,7 @@ class UserBase(SQLModel):
     birthdate: Optional[datetime] = Field(
         sa_column=Column(DateTime(timezone=True), nullable=True)
     )
+    bonus_balance: Optional[float] = Field(default=0)
 
 
 class User(BaseUUIDModel, UserBase, table=True):
