@@ -9,6 +9,7 @@ from app.models.base_model import BaseUUIDModel
 class VisitBase(SQLModel):
     start_date: Optional[datetime] = Field(default_factory=datetime.utcnow)
     end_date: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    total_cost: Optional[float]
 
 
 class Visit(BaseUUIDModel, VisitBase, table=True):
