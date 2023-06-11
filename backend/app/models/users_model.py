@@ -42,4 +42,8 @@ class User(BaseUUIDModel, UserBase, table=True):
         back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
+    transactions: List["Transaction"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
     is_active: bool = Field(default=True)
