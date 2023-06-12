@@ -13,4 +13,3 @@ class TariffUpdate(TariffBase):
 
 class TariffRead(TariffBase):
     id: UUID
-    workspace_id: UUID

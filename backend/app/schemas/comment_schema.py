@@ -12,6 +12,5 @@ class CommentUpdate(CommentBase):
 
 class CommentRead(CommentBase):
     id: UUID
-    workspace_id: UUID
     user_id: UUID
     created_at: datetime
