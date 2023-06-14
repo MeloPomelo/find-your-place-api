@@ -1,11 +1,10 @@
 from typing import Dict, List, Union
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.crud import role_crud, user_crud, category_crud, parameter_crud, status_crud, workspace_crud
+from app.crud import role_crud, user_crud, category_crud, parameter_crud, status_crud
 from app.schemas.role_schema import RoleCreate
 from app.schemas.category_schema import CategoryCreate
 from app.schemas.parameter_schema import ParameterCreate
 from app.schemas.status_schema import StatusCreate
-from app.schemas.workspace_schema import WorkspaceCreate
 from app.core.config import settings
 from app.schemas.user_schema import UserCreateWithRole
 
@@ -23,7 +22,8 @@ users: List[Dict[str, Union[str, UserCreateWithRole]]] = [
             first_name="Admin",
             last_name="FastAPI",
             password=settings.FIRST_SUPERUSER_PASSWORD,
-            username="admin"
+            username="admin",
+            bonus_balance=0,
         ),
         "role": "admin",
     },
@@ -32,7 +32,8 @@ users: List[Dict[str, Union[str, UserCreateWithRole]]] = [
             first_name="User",
             last_name="FastAPI",
             password=settings.FIRST_USER_PASSWORD,
-            username="user"
+            username="user",
+            bonus_balance=0,
         ),
         "role": "user",
     },
@@ -103,7 +104,7 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     },
     {
         "data": ParameterCreate(
-            name="душевая комната",
+            name="Душевая комната",
             code_name="shower"
         ),
         "category": "Комнаты"
@@ -152,8 +153,8 @@ parameters: List[Dict[str, Union[str, ParameterCreate]]] = [
     },
     {
         "data": ParameterCreate(
-            name="почасовая оплата",
-            code_name="hourly_payment"
+            name="Почасовая оплата",
+            code_name="paid"
         ),
         "category": "Дополнительно"
     }

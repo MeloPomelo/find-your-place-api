@@ -91,6 +91,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         await db_session.refresh(workspace)
         return workspace
 
+
     async def set_status(
         self,
         *,
