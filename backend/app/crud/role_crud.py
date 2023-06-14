@@ -17,6 +17,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         role = await db_session.execute(select(Role).where(Role.name == name))
         return role.scalar_one_or_none()
 
+
     async def add_role_to_user(self, *, user: User, role_id: UUID) -> Role:
         db_session = super().get_db().session
         role = await super().get(id=role_id)

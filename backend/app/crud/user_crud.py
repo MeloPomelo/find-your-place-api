@@ -17,7 +17,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         username: str, 
         db_session: Optional[AsyncSession] = None
     ) -> Optional[User]:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         users = await db_session.execute(select(User).where(User.username == username))
         return users.scalar_one_or_none()
 
@@ -28,7 +28,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         UserCreate, 
         db_session: Optional[AsyncSession] = None
     ) -> User:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         db_obj = User.from_orm(obj_in)
         db_obj.hashed_password = get_password_hash(obj_in.password)
 
@@ -47,7 +47,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     async def create_with_role(
         self, *, obj_in: UserCreate, db_session: Optional[AsyncSession] = None
     ) -> User:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         db_obj = User.from_orm(obj_in)
         db_obj.hashed_password = get_password_hash(obj_in.password)
         db_session.add(db_obj)
@@ -63,7 +63,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         obj_in: Union[int, str, Dict[str, Any]]
     ) -> Union[User, None]:
         response = None
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         for x in db_obj:
             x.is_active = obj_in.is_active
             db_session.add(x)
@@ -93,7 +93,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user_id: int,
         db_session: Optional[AsyncSession] = None
     ) -> Optional[User]:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         user = await self.get(id=user_id, db_session=db_session)
         user.bonus_balance += amount
         await db_session.commit()
