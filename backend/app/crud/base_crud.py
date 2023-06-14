@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from uuid import UUID
+from fastapi_async_sqlalchemy.middleware import DBSessionMeta
 # from app.schemas.common_schema import IOrderEnum
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 from fastapi_async_sqlalchemy.middleware import DBSessionMeta
@@ -33,11 +34,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
         self.db = db
 
-
+    
     def get_db(self) -> DBSessionMeta:
-        return self.db
+            return self.db
 
-
+        
     async def get(
         self, 
         *, 
@@ -65,6 +66,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return response.scalars().all()
         
 
+    
     async def get_multi_paginated(
         self,
         *,
