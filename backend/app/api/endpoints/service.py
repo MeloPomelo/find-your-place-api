@@ -6,14 +6,16 @@ from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params
 from typing import Optional
 from sqlmodel import select
+
 from app.api.endpoints import deps
-from app.models.users_model import User
-from app.models.workspace_model import Workspace
+from app.models import User, Workspace, Transaction
+
 from app.crud.parameter_crud import parameter
 from app.crud.category_crud import category
 from app.crud.status_crud import status
 from app.crud.workspace_crud import workspace
 from app.crud.user_crud import user
+from app.crud.transaction_crud import transaction
 
 from app.schemas.response_schemas import (
     GetResponseBase,
@@ -23,7 +25,7 @@ from app.schemas.response_schemas import (
     DeleteResponseBase,
     create_response,
 )
-from app.schemas.parameter_schema import ParameterRead
+
 from app.schemas.role_schema import RoleEnum
 from app.schemas.workspace_schema import WorkspaceRead
 from app.schemas.status_schema import IStatusWorkspace
@@ -73,7 +75,12 @@ async def set_workspace_status(
     if not new_status:
         raise HTTPException(status_code=404, detail="Status not found")
     current_workspace = await workspace.set_status(workspace=current_workspace, status=new_status)
-    await user.add_bonuses(user_id=current_workspace.user_id, amount=50)
+    await transaction.create_transaction(transaction=Transaction(
+            amount=50, 
+            description="Бонус за добавление места", 
+            user_id=current_workspace.user_id
+        )
+    )
     return create_response(data=current_workspace)
 
 

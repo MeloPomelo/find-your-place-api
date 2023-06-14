@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi_async_sqlalchemy.middleware import DBSessionMeta
 # from app.schemas.common_schema import IOrderEnum
 from fastapi_pagination.ext.async_sqlalchemy import paginate
+from fastapi_async_sqlalchemy.middleware import DBSessionMeta
 from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params, Page
 from fastapi_pagination.bases import AbstractPage

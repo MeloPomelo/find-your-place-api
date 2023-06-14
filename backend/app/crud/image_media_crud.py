@@ -20,7 +20,7 @@ class CRUDImageMedia(CRUDBase[ImageMedia, ImageMediaCreate, ImageMediaUpdate]):
             image: MediaCreate,
             db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
 
         image_media = ImageMedia(
             media=Media.from_orm(image),

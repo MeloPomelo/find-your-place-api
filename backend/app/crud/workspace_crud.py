@@ -21,7 +21,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         image_id: int,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         db_image = await image_media.get(id=image_id)
         workspace.images.append(db_image)
         db_session.add(workspace)
@@ -37,7 +37,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         image_id: int,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         db_image = await image_media.get(id=image_id)
         workspace.images.remove(db_image)
         db_session.add(workspace)
@@ -54,7 +54,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         parameter: Parameter,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         workspace.parameters.append(parameter)
         db_session.add(workspace)
         await db_session.commit()
@@ -69,7 +69,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         parameter: Parameter,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         workspace.parameters.remove(parameter)
         db_session.add(workspace)
         await db_session.commit()
@@ -84,12 +84,13 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         tariff: Tariff,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         workspace.tariffs.append(tariff)
         db_session.add(workspace)
         await db_session.commit()
         await db_session.refresh(workspace)
         return workspace
+
 
     async def set_status(
         self,
@@ -98,7 +99,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         status: Status,
         db_session: Optional[AsyncSession] = None
     ) -> Workspace:
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         workspace.status_id = status.id
         db_session.add(workspace)
         await db_session.commit()
@@ -115,7 +116,7 @@ class CRUDWorkspace(CRUDBase[Workspace, WorkspaceCreate, WorkspaceUpdate]):
         db_session: Optional[AsyncSession] = None
     ):
         # Требует доработки
-        db_session = db_session or db.session
+        db_session = db_session or super().get_db().session
         curr_workspace = await self.get(id=workspace_id)
         if flag:
             curr_workspace.sum_rating += rating

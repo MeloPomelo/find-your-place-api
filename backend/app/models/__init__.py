@@ -10,3 +10,4 @@ from .parameter_model import Parameter
 from .status_model import Status
 from .visit_model import Visit
 from .tariff_model import Tariff
+from .transaction_model import Transaction
